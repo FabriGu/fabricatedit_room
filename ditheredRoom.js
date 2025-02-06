@@ -78,6 +78,15 @@ export class DitheredRoom {
                     vec2 ditherCoord = gl_FragCoord.xy / 8.0;
                     float threshold = texture2D(ditherPattern, mod(ditherCoord, 1.0)).r;
                     
+                    // Calculate luminance
+                    float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+                    
+                    // Skip dithering for very dark areas
+                    if (luminance < 0.02) {
+                        gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
+                        return;
+                    }
+                    
                     // Apply dithering to each color channel separately
                     float r = step(threshold, color.r);
                     float g = step(threshold, color.g);
