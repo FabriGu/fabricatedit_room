@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Room</title>
+    
+    <!-- Import maps for Three.js -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #000;
+        }
+        
+        #roomContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            font-size: 1.5em;
+            z-index: 1000;
+        }
+        
+        #interactionUI {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: #fff;
+            font-family: monospace;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingScreen">Loading Room...</div>
+    <div id="roomContainer"></div>
+    <div id="interactionUI">
+        <p>Click on items to interact</p>
+        <p id="itemDescription"></p>
+    </div>
+
+    <script type="module">
+        import { DitheredRoom } from './ditheredRoom.js';
+        import * as THREE from 'three';
+        
+        // Wait for everything to load
+        window.addEventListener('load', async () => {
+            try {
+                // Initialize room
+                const room = new DitheredRoom('roomContainer');
+                
+                // Load your 3D model
+                await room.loadModel('./scans/room0.glb');
+                
+                // Add some interactive items
+                room.addInteractiveItem(new THREE.Vector3(1, 0, 0), () => {
+                    document.getElementById('itemDescription').textContent = 'Art piece on the wall';
+                    document.getElementById('interactionUI').style.display = 'block';
+                });
+                
+                // Setup interaction handling
+                room.setupInteraction();
+                
+                // Start animation loop
+                room.animate();
+                
+                // Hide loading screen
+                document.getElementById('loadingScreen').style.display = 'none';
+            } catch (error) {
+                console.error('Error initializing room:', error);
+                document.getElementById('loadingScreen').textContent = 'Error loading room. Please refresh.';
+            }
+        });
+    </script>
+</body>
+</html>
