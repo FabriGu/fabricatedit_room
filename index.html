@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive 3D Room</title>
     
-    <!-- Import maps for Three.js -->
     <script type="importmap">
     {
         "imports": {
@@ -51,60 +50,100 @@
             z-index: 1000;
         }
         
-        #interactionUI {
+        .infoPopup {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            color: #fff;
-            font-family: monospace;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 300px;
             display: none;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
     <div id="loadingScreen">Loading Room...</div>
     <div id="roomContainer"></div>
-    <div id="interactionUI">
-        <p>Click on items to interact</p>
-        <p id="itemDescription"></p>
-    </div>
+    <div id="infoPopup" class="infoPopup"></div>
 
     <script type="module">
         import { DitheredRoom } from './ditheredRoom.js';
         import * as THREE from 'three';
         
-        // Wait for everything to load
         window.addEventListener('load', async () => {
             try {
-                // Initialize room
                 const room = new DitheredRoom('roomContainer');
                 
-                // Load your 3D model
-                await room.loadModel('./scans/room0.glb');
-                
-                // Add some interactive items
-                room.addInteractiveItem(new THREE.Vector3(1, 0, 0), () => {
-                    document.getElementById('itemDescription').textContent = 'Art piece on the wall';
-                    document.getElementById('interactionUI').style.display = 'block';
+                // Define viewpoints
+                room.addViewpoint('Entrance', [0, 2, 5], [0, 0, 0], {
+                    minPolarAngle: Math.PI / 4,
+                    maxPolarAngle: Math.PI / 2,
+                    minDistance: 3,
+                    maxDistance: 7
                 });
                 
-                // Setup interaction handling
-                room.setupInteraction();
+                room.addViewpoint('Bed', [-2, 2, 2], [-2, 0, 0], {
+                    minPolarAngle: Math.PI / 4,
+                    maxPolarAngle: Math.PI * 0.6,
+                    minDistance: 2,
+                    maxDistance: 5
+                });
                 
-                // Start animation loop
+                room.addViewpoint('Desk', [2, 2, -2], [2, 0, -2], {
+                    minPolarAngle: Math.PI / 4,
+                    maxPolarAngle: Math.PI * 0.6,
+                    minDistance: 2,
+                    maxDistance: 5
+                });
+                
+                // Add interactive items for navigation
+                room.addInteractiveItem(
+                    new THREE.Vector3(-2, 0, 0),
+                    () => room.goToViewpoint('Bed'),
+                    'viewpoint'
+                );
+                
+                room.addInteractiveItem(
+                    new THREE.Vector3(2, 0, -2),
+                    () => room.goToViewpoint('Desk'),
+                    'viewpoint'
+                );
+                
+                // Add info points
+                room.addInteractiveItem(
+                    new THREE.Vector3(0, 1, 0),
+                    () => showInfo('Welcome to my room! Click the green spheres to navigate.'),
+                    'info'
+                );
+                
+                // Load the model
+                await room.loadModel('./scans/room0.glb');
+                
+                // Go to initial viewpoint
+                await room.goToViewpoint('Entrance');
+                
+                // Start animation
                 room.animate();
                 
                 // Hide loading screen
                 document.getElementById('loadingScreen').style.display = 'none';
+                
             } catch (error) {
                 console.error('Error initializing room:', error);
                 document.getElementById('loadingScreen').textContent = 'Error loading room. Please refresh.';
             }
         });
+        
+        function showInfo(text) {
+            const popup = document.getElementById('infoPopup');
+            popup.textContent = text;
+            popup.style.display = 'block';
+            
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 3000);
+        }
     </script>
 </body>
 </html>
