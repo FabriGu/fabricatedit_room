@@ -75,13 +75,23 @@ export class DitheredRoom {
 
                 void main() {
                     vec4 color = texture2D(tDiffuse, vUv);
-                    float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-                    
                     vec2 ditherCoord = gl_FragCoord.xy / 8.0;
                     float threshold = texture2D(ditherPattern, mod(ditherCoord, 1.0)).r;
                     
-                    float dithered = step(threshold, gray);
-                    gl_FragColor = vec4(vec3(dithered), color.a);
+                    // Apply dithering to each color channel separately
+                    float r = step(threshold, color.r);
+                    float g = step(threshold, color.g);
+                    float b = step(threshold, color.b);
+                    
+                    // Mix between full color and dithered color
+                    float ditherStrength = 0.3; // Adjust this value to control dither intensity
+                    vec3 ditheredColor = mix(
+                        color.rgb,
+                        vec3(r, g, b),
+                        ditherStrength
+                    );
+                    
+                    gl_FragColor = vec4(ditheredColor, color.a);
                 }
             `
         };
@@ -304,18 +314,6 @@ export class DitheredRoom {
     }
 
     
-    onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.composer.setSize(window.innerWidth, window.innerHeight);
-        
-        // Update dither resolution uniform
-        const ditherPass = this.composer.passes[1];
-        if (ditherPass.uniforms.resolution) {
-            ditherPass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
-        }
-    }
 
     loadModel(url) {
         return new Promise((resolve, reject) => {
@@ -354,6 +352,19 @@ export class DitheredRoom {
         
         // Use composer instead of renderer for dithering effect
         this.composer.render();
+    }
+
+    onWindowResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.composer.setSize(window.innerWidth, window.innerHeight);
+        
+        // Update dither resolution uniform
+        const ditherPass = this.composer.passes[1];
+        if (ditherPass.uniforms.resolution) {
+            ditherPass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+        }
     }
 }
 
