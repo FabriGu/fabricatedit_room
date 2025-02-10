@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.typekit.net/juk6bpt.css">
     <title>Interactive 3D Room</title>
+    <!-- link css -->
+    <link rel="stylesheet" href="./css/desktop.css">
     
     <script type="importmap">
     {
@@ -63,59 +66,103 @@
     </style>
 </head>
 <body>
-    <div id="loadingScreen">Loading Room...</div>
+    <script type="module" src="galleryOverlay.js"></script>
+    <div id="loadingScreen">Loading Room... </div>
     <div id="roomContainer"></div>
+    
+    <div id="gallery-container">
+        <div id="gallery-overlay">
+
+        </div>
+    </div>
     <div id="infoPopup" class="infoPopup"></div>
 
     <script type="module">
+        
         import { DitheredRoom } from './ditheredRoom.js';
+        import { GalleryOverlay } from './galleryOverlay.js';
+        
+        // import { GalleryOverlay} from './galleryOverlay.js';
         import * as THREE from 'three';
         
         window.addEventListener('load', async () => {
             try {
                 const room = new DitheredRoom('roomContainer');
+
                 
                 // Define viewpoints
-                room.addViewpoint('Entrance', [0, 2, 5], [0, 0, 0], {
-                    minPolarAngle: Math.PI / 4,
-                    maxPolarAngle: Math.PI / 2,
-                    minDistance: 3,
+                // [x,  y, z], [lookX, lookY, lookZ]
+                // BLUE == Z
+                // GREEN == Y
+                // RED == X
+                room.addViewpoint('Entrance', [0, 2, -1], [0, 0, 0], {
+                    minPolarAngle: Math.PI / 12,
+                    maxPolarAngle: Math.PI / 20,
+                    minDistance: 2,
                     maxDistance: 7
                 });
                 
-                room.addViewpoint('Bed', [-2, 2, 2], [-2, 0, 0], {
+                room.addViewpoint('Bed', [0, 0, 0], [-2, 0, 0], {
                     minPolarAngle: Math.PI / 4,
                     maxPolarAngle: Math.PI * 0.6,
                     minDistance: 2,
                     maxDistance: 5
                 });
                 
-                room.addViewpoint('Desk', [2, 2, -2], [2, 0, -2], {
+                room.addViewpoint('Desk', [-1.1, -.3, -0.8], [-1.1, -0.5, -1.8], {
+                    minPolarAngle: Math.PI / 4,
+                    maxPolarAngle: Math.PI * 0.6,
+                    minDistance: 0.1,
+                    maxDistance: 0.5
+                });
+
+                room.addViewpoint('Lamp', [20, 20, -20], [20, 20, -20], {
                     minPolarAngle: Math.PI / 4,
                     maxPolarAngle: Math.PI * 0.6,
                     minDistance: 2,
                     maxDistance: 5
                 });
                 
-                // Add interactive items for navigation
-                room.addInteractiveItem(
-                    new THREE.Vector3(-2, 0, 0),
-                    () => room.goToViewpoint('Bed'),
-                    'viewpoint'
-                );
+                // // Add interactive items for navigation
+                // room.addInteractiveItem(
+                //     new THREE.Vector3(-2, 0, 0),
+                //     () => room.goToViewpoint('Bed'),
+                //     'viewpoint'
+                // );
                 
-                room.addInteractiveItem(
-                    new THREE.Vector3(2, 0, -2),
-                    () => room.goToViewpoint('Desk'),
-                    'viewpoint'
-                );
+                // room.addInteractiveItem(
+                //     new THREE.Vector3(-1.1, -0.5, -1),
+                //     () => room.goToViewpoint('Desk'),
+                //     'viewpoint'
+                // );
+
+                // Initialize gallery overlay
+        const gallery = new GalleryOverlay('gallery-container');
+
+        gallery.setCloseCallback(() => room.goToViewpoint('Entrance'));
+
+        // await gallery.loadWorks();  // Load the works data
+        room.addInteractiveItem(
+            new THREE.Vector3(-1.1, -0.5, -1),
+            async () => {
+                await room.goToViewpoint('Desk');
+                gallery.show();
+            },
+            'viewpoint'
+        );
                 
-                // Add info points
-                room.addInteractiveItem(
-                    new THREE.Vector3(0, 1, 0),
-                    () => showInfo('Welcome to my room! Click the green spheres to navigate.'),
-                    'info'
-                );
+                // // Add info points
+                // room.addInteractiveItem(
+                //     new THREE.Vector3(0, 1, 0),
+                //     () => showInfo('Welcome to my room! Click the green spheres to navigate.'),
+                //     'info'
+                // );
+
+                // room.addInteractiveItem(
+                //     new THREE.Vector3(1, 0, 0),
+                //     () => room.goToViewpoint('Lamp'),
+                //     'viewpoint'
+                // );
                 
                 // Load the model
                 await room.loadModel('./scans/room0.glb');

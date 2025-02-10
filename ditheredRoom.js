@@ -5,6 +5,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { GalleryOverlay } from './galleryOverlay.js';
+
 
 export class DitheredRoom {
     constructor(containerId) {
@@ -15,7 +17,15 @@ export class DitheredRoom {
         this.setup();
         this.setupLighting();
         this.setupPostProcessing();
+
+
+        // Add gallery overlay setup
+        // this.setupOverlay();
+
+
         this.setupInteractionSystem();
+
+
     }
 
     setup() {
@@ -47,6 +57,19 @@ export class DitheredRoom {
         this.controls.maxDistance = 10;
         
         window.addEventListener('resize', this.onWindowResize.bind(this));
+
+        // Add grid helper after this line:
+        // this.scene = new THREE.Scene();
+
+        // Add these lines:
+        const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0x444444);
+        this.scene.add(gridHelper);
+
+        // Optional: Add axis helper to show X (red), Y (green), Z (blue) directions
+        const axisHelper = new THREE.AxesHelper(5);
+        this.scene.add(axisHelper);
+
+
     }
 
 
@@ -93,7 +116,7 @@ export class DitheredRoom {
                     float b = step(threshold, color.b);
                     
                     // Mix between full color and dithered color
-                    float ditherStrength = 0.3; // Adjust this value to control dither intensity
+                    float ditherStrength = 0.9; // Adjust this value to control dither intensity
                     vec3 ditheredColor = mix(
                         color.rgb,
                         vec3(r, g, b),
@@ -179,8 +202,15 @@ export class DitheredRoom {
 
     setupLighting() {
         // Ambient light for general illumination
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
         this.scene.add(ambientLight);
+
+        //MORE LIGHT!!
+        const ambientLight2 = new THREE.AmbientLight(0xffffff, 1);
+        this.scene.add(ambientLight2);
+        // const ambientLight3 = new THREE.AmbientLight(0xffffff, 1);
+        // this.scene.add(ambientLight3);
+         //MORE LIGHT!!
         
         // Main directional light with shadows
         const mainLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -191,7 +221,7 @@ export class DitheredRoom {
         this.scene.add(mainLight);
         
         // Point lights for room corners
-        const createPointLight = (x, y, z, intensity = 0.5, color = 0xffffff) => {
+        const createPointLight = (x, y, z, intensity = 0.8, color = 0xffffff) => {
             const light = new THREE.PointLight(color, intensity);
             light.position.set(x, y, z);
             light.castShadow = true;
@@ -275,7 +305,7 @@ export class DitheredRoom {
                 opacity: 0.7
             }),
             viewpoint: new THREE.MeshBasicMaterial({ 
-                color: 0x00ff00,
+                color: 0x8a00c2,
                 transparent: true,
                 opacity: 0.7
             }),
@@ -343,12 +373,20 @@ export class DitheredRoom {
                     gltf.scene.position.x -= center.x;
                     gltf.scene.position.y -= center.y;
                     gltf.scene.position.z -= center.z;
+                    // rotate the model in z axis
+                    gltf.scene.rotation.y = 0.8;
                     
                     this.scene.add(gltf.scene);
                     resolve(gltf);
                 },
                 (progress) => {
                     console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+                    // show loading percentage on the loader screen
+                    const loaderScreen = document.getElementById('loadingScreen');
+                    if (loaderScreen) {
+                        loaderScreen.innerText = 'Loading: ' + Math.round(progress.loaded / progress.total * 100) + '%';
+                    }
+
                 },
                 reject
             );
@@ -375,7 +413,19 @@ export class DitheredRoom {
             ditherPass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
         }
     }
+
+    // addDebugHelpers() {
+    //     // Add grid helper
+    //     const gridHelper = new THREE.GridHelper(10, 10);
+    //     this.scene.add(gridHelper);
+    
+    //     // Add axes helper
+    //     const axesHelper = new THREE.AxesHelper(5);
+    //     this.scene.add(axesHelper);
+    // }
 }
+
+
 
 
 

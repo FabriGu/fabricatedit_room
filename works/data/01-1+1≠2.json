@@ -1,0 +1,12 @@
+{
+    "title": "1+1≠2",
+    "description": "The two pieces in the collection aim to showcase that often innovation is forced into fashion generating articles of clothing that can be inconvenient to wear and provide no additional functionality.",
+    "priority": 9,
+    "tags": ["Interactive", "Sewing", "3D Printing", "Physical Computing"],
+    "date": "2024-03",
+    "link": "https://project-url.com",
+    "githubLink": "https://github.com/username/project",
+    "technologies": ["JavaScript", "p5.js", "HTML", "CSS"],
+    "textCol": "black",
+    "type": "normal"
+}

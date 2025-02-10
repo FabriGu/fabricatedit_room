@@ -1,0 +1,12 @@
+{
+    "title": "NEUDEI Website",
+    "description": "The NEUDEI project aims to emphasize that old styles and/or old articles of clothing are not to be thrown away as they can be revived by breaking them down and building them up again.",
+    "priority": 7,
+    "tags": ["Fashion", "Sewing", "Upcycling", "Sustainability"],
+    "date": "2024-03",
+    "link": "https://project-url.com",
+    "githubLink": "https://github.com/username/project",
+    "technologies": ["JavaScript", "p5.js", "HTML", "CSS"],
+    "textCol": "black",
+    "type": "normal"
+}

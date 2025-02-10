@@ -1,0 +1,12 @@
+{
+    "title": "Genuary 2025",
+    "description": "A collection of generative art pieces created during Genuary 2025.",
+    "priority": 10,
+    "tags": ["Interactive", "Sewing", "3D Printing", "Physical Computing"],
+    "date": "2024-03",
+    "link": "https://project-url.com",
+    "githubLink": "https://github.com/username/project",
+    "technologies": ["JavaScript", "p5.js", "HTML", "CSS"],
+    "textCol": "black",
+    "type": "row"
+}

@@ -1,0 +1,866 @@
+/* ----------------------------------------------------------- FONTS */
+
+.fontPrimary {
+    font-family: "scandia-line-web", monospace;
+    font-weight: 700;
+    font-style: normal;
+    /* font-size: 300px !important; */
+    color: #333;
+  }
+  
+  .fontSecondary {
+    font-family: "scandia-line-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    /* font-size: 170px !important; */
+    color: #333;
+  }
+  
+  .fontTertiary {
+    font-family: "scandia-line-web", monospace;
+    font-weight: 500;
+    font-style: normal;
+    /* font-size: 100px !important; */
+    color: #333;
+  }
+  
+  .fontQuaternary {
+    /* font-size: 70px !important; */
+    font-family: "scandia-line-web", monospace;
+    font-weight: 900;
+    font-style: normal;
+    /* font-size: 100px !important; */
+    color: #333;
+  }
+  
+  .fontQuinary {
+    font-family: "scandia-line-web", monospace;
+    font-variation-settings: "wght" 900;
+    font-weight: 500;
+    /* font-size: 40px !important; */
+    /* -webkit-text-stroke: white 5px; */
+    color: #333;
+  }
+  
+  .fontSestaray {
+    /* font-family: "asterisk-sans-variable", sans-serif; */
+    font-family: "scandia-line-web", monospace;
+  
+    font-variation-settings: "wght" 900;
+    font-size: 15px !important;
+    /* -webkit-text-stroke: white 5px; */
+    color: #333;
+  }
+  
+  /* ----------------------------------------------------------- GENERAL */
+  
+  body {
+    height: 100vh;
+    overflow: hidden; /* Prevents body scrolling */
+  }
+  
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  canvas {
+    display: block;
+  }
+    
+  /* --------------------------------------------------------- BOOTSTRAP */
+  .container-fluid {
+    /* border: 1px solid #111; */
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+  
+    position:absolute;
+    top:0;
+    left:0;
+  
+  }
+  
+  .row {
+    /* border: 1px solid #000; */
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .col {
+    /* border: 1px solid #000; */
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* ----------------------------------------------------------- INTRO */
+  #intro {
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      flex-direction: column;
+  
+      /* background: color(255,255,255,0.5); */
+  }
+  
+  #intro h1 {
+      font-size: 10em;
+      text-align: center;
+      line-height: 50px;
+  }
+  
+  #intro p {
+      font-size: 3em;
+      text-align: center;
+      line-height: normal;
+  
+      margin-left: 30%;
+      margin-right: 30%;
+      max-width: 40%;
+  
+      line-height: 50px;
+  }
+  
+  #intro h1, #intro p {
+      z-index: 2;
+      position: relative;
+   
+      color: rgba(250,250,255,1);
+  }
+  
+  /* ------------------------------ */
+  
+  #intro {
+    text-align: center;
+    position: relative;
+  }
+  
+  #intro h1 {
+    /* font-size: 5rem; */
+    /* margin: 0;
+    padding: 0; */
+    /* transition: transform 1s ease; */
+    /* transform: translateY(0); */
+    /* opacity: 0; */
+    /* animation: titleAppear 1s ease forwards; */
+  
+  }
+  
+  #intro p {
+    /* font-size: 1.5rem; */
+    /* margin-top: 1rem; */
+    margin-top: 20px;
+  
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: textAppear 5s ease forwards 2s;
+  }
+  
+  #intro.active h1 {
+    transform: translateY(-40px);
+  }
+  
+  #intro.active p {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  @keyframes titleAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  @keyframes titleSlideUp {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-40px);
+    }
+  }
+  
+  @keyframes textAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+  
+  /* ----------------------------------------------------------------------- P5 */
+  #p5-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+  }
+  
+  /* --------------------------------------------------------- INNER SCROLL */
+  /* This contains all your scrollable content */
+  .scroll-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto; /* Enables scrolling */
+    z-index: 1; /* Puts content above background */
+  }
+  
+  /* Style for the content container */
+  .content-wrapper {
+    position: relative;
+    min-height: 100vh; /* Ensures content is at least full height */
+    background: transparent; /* Allows background to show through */
+  }
+  
+  
+  /* --------------------------------------------------- OPAQUE SCREEN BACKGROUND */
+  
+  #opaqueScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+    opacity: 0;
+    z-index: 1;
+  }
+  
+  /* ----------------------------------------------------------- CONTENT */
+  
+  #work, #about, #contact {
+    /* border: 2px solid #0000ff; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position:relative;
+    z-index: 2;
+  }
+  
+  #work h3, #about h3, #contact h3 {
+    font-size: 7em;
+    text-align: center;
+  
+    padding:20px 0;
+  }
+  
+  #work .col-sm-12 .row {
+    /* border: 2px solid #ff0000; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  
+  /* ----------------------------------------------------------- WORK CARDS */
+  
+  #gallery-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto; /* Enables scrolling */
+    z-index: 1; /* Puts content above background */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+  }
+  
+  #cards, #gallery-overlay {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap:wrap;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  
+    height: auto;
+  }
+
+  
+  .work-card{
+    flex-grow: 1;
+  
+    margin: 2rem 0;
+    /* padding: 2rem; */
+    margin-left:5vw !important;
+    margin-right:5vw !important;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .work-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .work-card-image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .work-card-image > * {
+    object-fit: contain;
+  }
+  
+  .work-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+  }
+  
+  .work-card video {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    /* margin-bottom: 1rem; */
+  }
+  
+  .work-card-content h4 {
+      margin: 0 0 1rem 0;
+  }
+  
+  .work-card-content p {
+      margin: 0 0 1rem 0;
+      line-height: 1.5;
+  }
+  
+  .work-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+  }
+  
+  .tag {
+      padding: 0.25rem 0.75rem;
+      background: #f0f0f0;
+      border-radius: 999px;
+      color: #333;
+  }
+  
+  .vids {
+    object-fit: cover;
+    
+    margin-bottom: -6px;
+    width: 100%;
+  }
+  
+  .text-container {
+    /* opaque background and rounded edges */
+    /* background: rgba(250,250,255,0.9); */
+    /* border-radius: 3px; */
+    /* width: 100%; */
+    /* height:100%; */
+    box-sizing: border-box;
+  
+  }
+  /* 
+  .text-container.visible {
+    visibility: visible;
+    opacity: 1;
+  } */
+  
+  .text-container .fontQuaternary {
+    
+      font-size: 2.5em;
+      text-align: center;
+      margin-top: 1rem;
+  }
+  
+  .text-container .fontQuinary {
+    
+      font-size: 1.5em;
+      text-align: center;
+      margin-top: 1rem;
+  }
+  
+  .text {
+    padding-bottom: 1rem;
+  }
+  
+  /* ---------------------------------------------- ABOUT + CONTACT*/
+  #about > *, #contact >* {
+    /* border: 2px solid #0000ff; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position:relative;
+    z-index: 2;
+    
+    width: 80%;
+  
+    text-align: justify;
+  }
+  
+  #aboutContainer {
+    /* style the about container that has two div children (img and text) so that they display beside each other when width allows and in a column when not */
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+  
+  }
+  
+  #aboutContent {
+    padding: 20px;
+  
+    width: 80%;
+  
+    font-size: 20pt;
+    font-weight: 900;
+  }
+  
+  #aboutImg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    width: 40%;
+    height: auto;
+  }
+  
+  .text-container {
+    /* textContainer.style.display = 'flex';
+    textContainer.style.flexDirection = 'column';
+    textContainer.style.alignItems = 'center';
+    textContainer.style.justifyContent = 'center';
+    textContainer.style.width = '100%';
+    textContainer.style.height = '100%';
+    textContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  /* 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease; */
+  
+    /* width: 80%; */
+    /* height: 100%; */
+    /* height: 100%; */
+    /* background-color: rgba(0, 0, 0, 0.5); */
+  
+    position: absolute;
+    z-index: 5;
+  
+    padding-left: 5rem;
+    padding-right:5rem;
+  }
+  
+  .text {
+    text-align: center;
+  
+  
+    /* margin: 20% ; */
+  }
+  
+  /* --------------------------------------------------CONTACT */
+  #contactContainer {
+    display:flex;
+    flex-direction:row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    /* flex-grow:1; */
+    width: 100%;
+  
+    margin-bottom: 10%;
+  }
+  
+  #contactContainer > * {
+    /* border: 1px solid #fff; */
+    color:#fff;
+  
+    text-align: center;
+    width: 30%;
+    /* width: 20%; */
+    flex-grow: 0.5;
+  }
+  
+  #socials {
+    
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 30%;
+  }
+  
+  #socials a {
+    
+      margin:5px !important;
+  }
+  
+  /* ------------------------------------ CAROUSEL ----- */
+  .work-card.row-type {
+    width: 100%;
+    aspect-ratio: 16/9;
+    margin: 2rem 0;
+    /* padding: 2rem; */
+    margin-left: 5vw !important;
+    margin-right: 5vw !important;
+    border: 0px;
+  }
+  
+  .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  
+  .carousel-track {
+    position: absolute;
+    display: flex;
+    gap: 2rem;
+    height: 100%;
+    width:100%;
+    transition: transform 0.1s ease-out;
+    z-index: 1;
+  }
+  
+  .carousel-item {
+    flex: 0 0 calc(33.333% - 2rem);
+    min-width: calc(33.333% - 2rem);
+    height: 100%;
+    width:100% !important;
+    border-radius: 4px;
+    /* overflow: hidden; */
+    /* display: flex; */
+    aspect-ratio: 16/16 !important;
+  }
+  
+  .carousel-item video,
+  .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .carousel-wrapper .text-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .carousel-wrapper .text-container.visible {
+    visibility: visible;
+    opacity: 0;
+  }
+  
+  .work-card.row-type .carousel-item {
+    position: relative;
+      display: block !important;
+      /* float: none !important; */
+      aspect-ratio: 1/1 !important;  /* This makes it square */
+      height: 100% !important;
+      width: auto !important;  /* Let height determine width for square */
+      margin-right: 2rem !important;
+      border-radius: 4px;
+      overflow: hidden;
+  }
+  
+  /* Make sure our wrapper and track styles are specific enough */
+  .work-card.row-type .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  
+  .work-card.row-type .carousel-track {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    transition: transform 0.1s ease-out;
+    z-index: 1;
+  }
+  
+  /* Override any media element styles */
+  .work-card.row-type .carousel-item video,
+  .work-card.row-type .carousel-item img,
+  .work-card.row-type .carousel-item .vids {
+    position: relative;
+    display: block !important;
+    /* float: none !important; */
+    aspect-ratio: 1/1 !important;  /* This makes it square */
+    height: 100% !important;
+    width: auto !important;  /* Let height determine width for square */
+    margin-right: 2rem !important;
+    border-radius: 4px;
+    /* overflow: hidden; */
+  
+  }
+  
+  .work-card.row-type {
+    width: 100%;
+    aspect-ratio: 16/9;
+    margin: 2rem 0;
+    /* padding: 2rem; */
+    margin-left: 5vw !important;
+    margin-right: 5vw !important;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  /* 
+  .work-card.row-type .carousel-track {
+    position: absolute;
+    display: flex;
+    height: 60%;
+    transition: transform 0.1s ease-out;
+    z-index: 1;
+  } */
+  .work-card.row-type .carousel-item {
+    position: relative;
+    display: block !important;
+    float: none !important;
+    /* Take the full height of the card and make width match for square */
+    height: 100% !important;
+    aspect-ratio: 1/1 !important;
+    flex: 0 0 auto !important; /* Prevent flex from squishing */
+    margin-right: 2rem !important;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .work-card.row-type .carousel-item video,
+  .work-card.row-type .carousel-item img,
+  .work-card.row-type .carousel-item .vids {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block !important;
+  }
+  
+  .work-card.row-type .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    border-radius: 4px;
+    /* scroll-behavior: smooth; */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  .work-card.row-type .carousel-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Opera */
+  }
+  
+  .work-card.row-type .carousel-track {
+    display: flex;
+    height: 100%;
+    gap: 2rem;
+  }
+  
+  .work-card.row-type .carousel-item {
+    /* scroll-snap-align: center; */
+    flex: 0 0 100%;
+    height: 100%;
+    aspect-ratio: 1/1;
+  }
+  
+
+
+  /* --- change style */
+  /* Modify the gallery container to have a more grainy/dithered look */
+#gallery-container {
+    /* Keep your existing positioning */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1;
+    
+    /* Add a dark, slightly transparent background */
+    /* background-color: rgba(17, 17, 17, 0.85); */
+     /* Matches your scene background color */
+    
+    /* Add a noise texture using a repeating pattern */
+    /* background-image: url("data:image/png;base64,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"); */
+    filter: contrast(100%) brightness(100%);
+}
+
+/* Style the work cards to be more "retro" */
+.work-card {
+    /* Keep your flex and margin settings */
+    flex-grow: 1;
+    margin: 2rem 0;
+    /* padding: 2rem; */
+    margin-left: 5vw !important;
+    margin-right: 5vw !important;
+    
+    /* Add a subtle pixelated border */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    
+    /* Sharper transitions to match the dithered look */
+    transition: transform 0.15s steps(5);
+}
+
+/* Make text more crisp/pixelated to match the dithered aesthetic */
+.text-container .fontQuaternary,
+.text-container .fontQuinary {
+    /* text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8); */
+    /* Increase contrast for better readability */
+    /* color: rgba(255, 255, 255, 0.95); */
+}
+
+/* Add pixelated transitions */
+.text-container {
+    transition: all 0.15s steps(5);
+    background: rgba(0, 0, 0, 0.85);
+    /* border: 1px solid rgba(255, 255, 255, 0.15); */
+}
+
+/* Keep videos and images crisp */
+.work-card img,
+.work-card video,
+.vids {
+    /* border: 1px solid rgba(255, 255, 255, 0.15); */
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
+}
+
+/* Add a subtle scan line effect */
+#gallery-container::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}
+  
+
+/* Add border to carousel items */
+.carousel-item video,
+.carousel-item img,
+.carousel-item ,
+.work-card img,
+.work-card video,
+.vids {
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important;
+    box-sizing: border-box;
+}
+
+/* Remove the global scanline effect */
+#gallery-container::after {
+    display: none;
+}
+
+/* Add scanlines to text containers and make them fill the media container */
+.text-container {
+    position: absolute;
+
+    top: 50%;
+    
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100% !important;
+    /* height: 100% !important; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    padding: 0; /* Remove the padding that was causing size issues */
+    background: rgba(0, 0, 0, 0.85);
+    transition: all 0.15s steps(5);
+}
+
+/* Add scanlines to text container background */
+.text-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: -1; /* Place behind the text */
+}
+
+/* Make sure work-card-image maintains relative positioning for absolute text container */
+.work-card-image,
+.carousel-item {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Adjust text alignment and spacing within container */
+.text-container .title,
+.text-container .text {
+    position: relative;
+    z-index: 1;
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
+}
