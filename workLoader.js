@@ -643,109 +643,70 @@ export class WorkLoader {
         this.container = document.getElementById(containerId);
         this.works = [];
         this.pendingCarouselItems = new Map(); // Store items to load later
-        this.containerType = this.container.id.substring(this.container.id.length-6);
+        this.containerType = this.container.id.substring(this.container.id.length-5);
         console.log(this.containerType);
     }
 
     async loadWorks() {
-        if (this.containerType == '-works') {
-            // loading work data
-            console.log('Loading works data');
-            try {
-                const response = await fetch('../works/index.json');
-                const worksIndex = await response.json();
-                
-                // Load works data first
-                for (const work of worksIndex.works) {
-                    const dataResponse = await fetch(`../works/data/${work.dataFile}`);
-                    const workData = await dataResponse.json();
-                    
-                    if (Array.isArray(work.imageFile)) {
-                        // For carousel items, only prepare first 3 items initially
-                        const initialItems = work.imageFile.slice(0, 3);
-                        const remainingItems = work.imageFile.slice(3);
-                        
-                        workData.mediaItems = initialItems.map(file => ({
-                            url: `../works/images/${file}`,
-                            type: this.getMediaType(file)
-                        }));
-                        
-                        // Store remaining items for later loading
-                        if (remainingItems.length > 0) {
-                            this.pendingCarouselItems.set(workData.title, {
-                                items: remainingItems,
-                                workData: workData
-                            });
-                        }
-                        
-                        const mediaUrl = `../works/images/${work.imageFile[0]}`;
-                        const workCard = new WorkCard(mediaUrl, workData);
-                        this.works.push(workCard);
-                    } else {
-                        const mediaUrl = `../works/images/${work.imageFile}`;
-                        const workCard = new WorkCard(mediaUrl, workData);
-                        this.works.push(workCard);
-                    }
-                }
-                
-                this.works.sort((a, b) => b.priority - a.priority);
-                this.renderWorks();
-                
-                // Start loading remaining carousel items after initial render
-                this.loadRemainingCarouselItems();
-            } catch (error) {
-                console.error('Error loading works:', error);
-            }
+       // create title 
+       if (this.containerType === 'works') {
+        const title = document.createElement("h3");
+        title.textContent = "Work";
+        title.classList.add("fontSecondary");
+        console.log('Creating title');
+        this.container.appendChild(title);
+        
+       }
+       // loading work data
+       console.log('Loading works data');
 
-        } else if (this.containerType == '-music') {
-            // Load music data
-            console.log('Loading music data');
-            try {
-                const response = await fetch('../music/index.json');
-                const worksIndex = await response.json();
-                
-                // Load works data first
-                for (const work of worksIndex.works) {
-                    const dataResponse = await fetch(`../music/data/${work.dataFile}`);
-                    const musicData = await dataResponse.json();
-                    
-                    if (Array.isArray(work.imageFile)) {
-                        // For carousel items, only prepare first 3 items initially
-                        const initialItems = work.imageFile.slice(0, 3);
-                        const remainingItems = work.imageFile.slice(3);
-                        
-                        workData.mediaItems = initialItems.map(file => ({
-                            url: `../music/images/${file}`,
-                            type: this.getMediaType(file)
-                        }));
-                        
-                        // Store remaining items for later loading
-                        if (remainingItems.length > 0) {
-                            this.pendingCarouselItems.set(musicData.title, {
-                                items: remainingItems,
-                                musicData: workData
-                            });
-                        }
-                        
-                        const mediaUrl = `../music/images/${music.imageFile[0]}`;
-                        const workCard = new WorkCard(mediaUrl, musicData);
-                        this.works.push(workCard);
-                    } else {
-                        const mediaUrl = `../music/images/${music.imageFile}`;
-                        const workCard = new WorkCard(mediaUrl, musicData);
-                        this.works.push(workCard);
-                    }
-                }
-                
-                this.works.sort((a, b) => b.priority - a.priority);
-                this.renderWorks();
-                
-                // Start loading remaining carousel items after initial render
-                this.loadRemainingCarouselItems();
-            } catch (error) {
-                console.error('Error loading works:', error);
-            }
-        }
+
+       try {
+           const response = await fetch(`../${this.containerType}/index.json`);
+           const worksIndex = await response.json();
+           
+           // Load works data first
+           for (const work of worksIndex.works) {
+               const dataResponse = await fetch(`../${this.containerType}/data/${work.dataFile}`);
+               const workData = await dataResponse.json();
+               
+               if (Array.isArray(work.imageFile)) {
+                   // For carousel items, only prepare first 3 items initially
+                   const initialItems = work.imageFile.slice(0, 3);
+                   const remainingItems = work.imageFile.slice(3);
+                   
+                   workData.mediaItems = initialItems.map(file => ({
+                       url: `../${this.containerType}/images/${file}`,
+                       type: this.getMediaType(file)
+                   }));
+                   
+                   // Store remaining items for later loading
+                   if (remainingItems.length > 0) {
+                       this.pendingCarouselItems.set(workData.title, {
+                           items: remainingItems,
+                           workData: workData
+                       });
+                   }
+                   
+                   const mediaUrl = `../${this.containerType}/images/${work.imageFile[0]}`;
+                   const workCard = new WorkCard(mediaUrl, workData);
+                   this.works.push(workCard);
+               } else {
+                   const mediaUrl = `../${this.containerType}/images/${work.imageFile}`;
+                   const workCard = new WorkCard(mediaUrl, workData);
+                   this.works.push(workCard);
+               }
+           }
+           
+           this.works.sort((a, b) => b.priority - a.priority);
+           this.renderWorks();
+           
+           // Start loading remaining carousel items after initial render
+           this.loadRemainingCarouselItems();
+       } catch (error) {
+           console.error('Error loading works:', error);
+       }
+        
         
     }
 
@@ -754,19 +715,11 @@ export class WorkLoader {
             // Load items progressively with a small delay
             for (const file of items) {
                 await new Promise(resolve => setTimeout(resolve, 200)); // Small delay between items
-                
-                let newItem;
-                if (this.containerType == '-works') {
-                    newItem = {
-                        url: `../works/images/${file}`,
-                        type: this.getMediaType(file)
-                    };
-                } else if (this.containerType == '-music') {
-                    newItem = {
-                        url: `../music/images/${file}`,
-                        type: this.getMediaType(file)
-                    };
-                }
+
+                let newItem = {
+                    url: `../${this.containerType}/images/${file}`,
+                    type: this.getMediaType(file)
+                };
                 
                 // Find the carousel track for this work
                 const carousel = document.querySelector(`[data-title="${title}"] .carousel-track`);

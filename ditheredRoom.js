@@ -338,13 +338,13 @@ export class DitheredRoom {
                 // Make camera look at target
                 const lookAt = new THREE.Vector3(...viewpoint.target);
                 this.camera.lookAt(lookAt);
-                console.log(lookAt)
+                // console.log(lookAt)
 
-                console.log("Camera after viewpoint set:", {
-                    quaternion: this.camera.quaternion.clone(),
-                    euler: new THREE.Euler().setFromQuaternion(this.camera.quaternion, 'YXZ')
+                // console.log("Camera after viewpoint set:", {
+                //     quaternion: this.camera.quaternion.clone(),
+                //     euler: new THREE.Euler().setFromQuaternion(this.camera.quaternion, 'YXZ')
 
-                });
+                // });
 
                 this.controls.updateRotation(this.camera.quaternion);
                 if (progress < 1) {
