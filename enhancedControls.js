@@ -7,7 +7,7 @@ export class EnhancedControls {
         this.scene = scene;
 
         // Core movement settings
-        this.moveSpeed = 0.005;
+        this.moveSpeed = 0.0;
         this.rotateSpeed = 0.003;
         this.zoomSpeed = 0.8;  // Adjusted for smoother zoom
 
@@ -15,9 +15,29 @@ export class EnhancedControls {
         this.maxPolarAngle = Math.PI * 0.4;
         this.minPolarAngle = -Math.PI * 0.4;
 
+        // euler: Euler {x: -0.123, y: 2.456, z: 0, order: "YXZ"}
+        const euler = new THREE.Euler(-1.5,-.5
+            , 0, 'YXZ');
         // Current rotation angles
-        this.rotationX = 0;
-        this.rotationY = 0;
+        this.rotationX = euler.x;
+        this.rotationY = euler.y;
+        this.rotationZ = euler.z;
+
+    //   // Get the forward direction of the camera
+    //   const forward = new THREE.Vector3(0, 0, -1);
+    //   forward.applyQuaternion(this.camera.quaternion);
+
+    //   // Calculate initial rotationX (yaw) - around Y axis
+    //   this.rotationX = Math.atan2(-forward.x, -forward.z);
+
+    //   // Calculate initial rotationY (pitch) - around X axis
+    //   const horizontalLength = Math.sqrt(forward.x * forward.x + forward.z * forward.z);
+    //   this.rotationY = Math.atan2(forward.y, horizontalLength);
+
+    //   console.log('Initial angles:', {
+    //       x: this.rotationX * (180/Math.PI),
+    //       y: this.rotationY * (180/Math.PI)
+    //   });
 
         // State management
         this.isMoving = false;
@@ -161,6 +181,27 @@ export class EnhancedControls {
         this.camera.quaternion.setFromEuler(rotation);
     }
 
+    // rotateCamera(deltaX, deltaY) {
+    //     // Update rotation angles
+    //     this.rotationX += deltaX * this.rotateSpeed;
+    //     this.rotationY += deltaY * this.rotateSpeed;
+
+    //     // Clamp vertical rotation
+    //     this.rotationY = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this.rotationY));
+
+    //     // Apply rotations using quaternions
+    //     const qx = new THREE.Quaternion();
+    //     qx.setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.rotationX);
+        
+    //     const qy = new THREE.Quaternion();
+    //     qy.setFromAxisAngle(new THREE.Vector3(1, 0, 0), this.rotationY);
+        
+    //     const quaternion = new THREE.Quaternion();
+    //     quaternion.multiplyQuaternions(qx, qy);
+        
+    //     this.camera.quaternion.copy(quaternion);
+    // }
+
     moveCamera(deltaX, deltaY) {
         // Get forward and right vectors from camera
         const forward = new THREE.Vector3(0, 0, -1);
@@ -204,6 +245,31 @@ export class EnhancedControls {
 
     update() {
         // Add any per-frame updates here if needed
+        // update the rotation coordinates 
+
+    }
+    // update(lookAt) {
+    //     // Add any per-frame updates here if needed
+    //     // update the rotation coordinates based on Vector3 lookat
+    //     // const lookAt = new THREE.Vector3(0, 0, 0);
+    //     this.rotationX = Math.atan2(-lookAt.x, -lookAt.z);
+    //     const horizontalLength = Math.sqrt(lookAt.x * lookAt.x + lookAt.z * lookAt.z);
+    //     this.rotationY = Math.atan2(lookAt.y, horizontalLength);
+    //     console.log('Updated angles:', {
+    //         x: this.rotationX * (180/Math.PI),
+    //         y: this.rotationY * (180/Math.PI)
+    //     });
+
+        
+    // }
+
+    // In EnhancedControls.js
+    updateRotation(quaternion) {
+        // Extract the rotations we need from the camera's quaternion
+        const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+        euler.setFromQuaternion(quaternion);
+        this.rotationX = euler.y;
+        this.rotationY = euler.x;
     }
 
     set bounds(newBounds) {

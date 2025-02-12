@@ -48,6 +48,8 @@ export class DitheredRoom {
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        // add an eventlistener for windowresize to reset device pixel ratio
+        
         this.renderer.shadowMap.enabled = true;
         this.container.appendChild(this.renderer.domElement);
 
@@ -57,6 +59,8 @@ export class DitheredRoom {
         // this.controls.maxPolarAngle = Math.PI * 0.75;
         // this.controls.minDistance = 2;
         // this.controls.maxDistance = 10;
+        console.log(this.camera);
+        console.log(this.camera.quaternion)
         this.controls = new EnhancedControls(this.camera, this.renderer.domElement, this.scene);
         
         window.addEventListener('resize', this.onWindowResize.bind(this));
@@ -137,6 +141,7 @@ export class DitheredRoom {
 
 
 
+
     createDitherPattern() {
         const pattern = [
             0, 32, 8, 40, 2, 34, 10, 42,
@@ -163,36 +168,50 @@ export class DitheredRoom {
     setupInteractionSystem() {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-
-        this.container.addEventListener('click', (event) => {
-            this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+    
+        // Handle both mouse clicks and touch events
+        const handleInteraction = (event) => {
+            event.preventDefault(); // Prevent default touch behavior
+            
+            // Get the correct coordinates whether it's touch or mouse
+            const x = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
+            const y = event.clientY || (event.touches && event.touches[0] ? event.touches[0].clientY : null);
+            
+            if (x === null || y === null) return;
+    
+            // Convert to normalized device coordinates
+            this.mouse.x = (x / window.innerWidth) * 2 - 1;
+            this.mouse.y = -(y / window.innerHeight) * 2 + 1;
+    
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
-
+    
             if (intersects.length > 0) {
                 const object = intersects[0].object;
                 if (object.userData.callback) {
                     object.userData.callback();
                 }
             }
-        });
-
-        // Hover effect
+        };
+    
+        // Add both mouse and touch event listeners
+        this.container.addEventListener('click', handleInteraction);
+        this.container.addEventListener('touchstart', handleInteraction, { passive: false });
+    
+        // Hover effects (mouse only)
         this.container.addEventListener('mousemove', (event) => {
             this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+    
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
-
+    
             this.interactiveObjects.forEach(obj => {
                 if (obj.material) {
                     obj.material.opacity = 0.7;
                 }
             });
-
+    
             if (intersects.length > 0) {
                 const object = intersects[0].object;
                 if (object.material) {
@@ -319,7 +338,15 @@ export class DitheredRoom {
                 // Make camera look at target
                 const lookAt = new THREE.Vector3(...viewpoint.target);
                 this.camera.lookAt(lookAt);
+                console.log(lookAt)
 
+                console.log("Camera after viewpoint set:", {
+                    quaternion: this.camera.quaternion.clone(),
+                    euler: new THREE.Euler().setFromQuaternion(this.camera.quaternion, 'YXZ')
+
+                });
+
+                this.controls.updateRotation(this.camera.quaternion);
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
@@ -479,10 +506,9 @@ export class DitheredRoom {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.composer.setSize(window.innerWidth, window.innerHeight);
         
-        // Update dither resolution uniform
-        const ditherPass = this.composer.passes[1];
-        if (ditherPass.uniforms.resolution) {
-            ditherPass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+        if (this.ditherPass) {
+            this.ditherPass.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+            this.ditherPass.uniforms.ditherScale.value = Math.min(window.innerWidth, window.innerHeight) / 1000;
         }
     }
 
