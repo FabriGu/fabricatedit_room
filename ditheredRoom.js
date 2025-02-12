@@ -6,6 +6,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { GalleryOverlay } from './galleryOverlay.js';
+import { EnhancedControls } from './enhancedControls.js';  // Import the new controls
+
 
 
 export class DitheredRoom {
@@ -49,12 +51,13 @@ export class DitheredRoom {
         this.renderer.shadowMap.enabled = true;
         this.container.appendChild(this.renderer.domElement);
 
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.05;
-        this.controls.maxPolarAngle = Math.PI * 0.75;
-        this.controls.minDistance = 2;
-        this.controls.maxDistance = 10;
+        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        // this.controls.enableDamping = true;
+        // this.controls.dampingFactor = 0.05;
+        // this.controls.maxPolarAngle = Math.PI * 0.75;
+        // this.controls.minDistance = 2;
+        // this.controls.maxDistance = 10;
+        this.controls = new EnhancedControls(this.camera, this.renderer.domElement, this.scene);
         
         window.addEventListener('resize', this.onWindowResize.bind(this));
 
@@ -254,32 +257,68 @@ export class DitheredRoom {
         this.currentViewpoint = name;
 
         // Apply restrictions
-        this.controls.minAzimuth = viewpoint.restrictions.minAzimuth;
-        this.controls.maxAzimuth = viewpoint.restrictions.maxAzimuth;
-        this.controls.minPolarAngle = viewpoint.restrictions.minPolarAngle;
-        this.controls.maxPolarAngle = viewpoint.restrictions.maxPolarAngle;
-        this.controls.minDistance = viewpoint.restrictions.minDistance;
-        this.controls.maxDistance = viewpoint.restrictions.maxDistance;
+        // this.controls.minAzimuth = viewpoint.restrictions.minAzimuth;
+        // this.controls.maxAzimuth = viewpoint.restrictions.maxAzimuth;
+        // this.controls.minPolarAngle = viewpoint.restrictions.minPolarAngle;
+        // this.controls.maxPolarAngle = viewpoint.restrictions.maxPolarAngle;
+        // this.controls.minDistance = viewpoint.restrictions.minDistance;
+        // this.controls.maxDistance = viewpoint.restrictions.maxDistance;
+
+        this.controls.bounds = new THREE.Box3(
+            new THREE.Vector3(
+                viewpoint.position.x - viewpoint.restrictions.maxDistance,
+                viewpoint.restrictions.minPolarAngle,
+                viewpoint.position.z - viewpoint.restrictions.maxDistance
+            ),
+            new THREE.Vector3(
+                viewpoint.position.x + viewpoint.restrictions.maxDistance,
+                viewpoint.restrictions.maxPolarAngle,
+                viewpoint.position.z + viewpoint.restrictions.maxDistance
+            )
+        );
 
         // Smoothly move camera to new position
         const startPos = this.camera.position.clone();
-        const startTarget = this.controls.target.clone();
+        // const startTarget = this.controls.target.clone();
         const duration = 1000; // 1 second transition
         const startTime = Date.now();
+
+        // return new Promise((resolve) => {
+        //     const animate = () => {
+        //         const elapsed = Date.now() - startTime;
+        //         const progress = Math.min(elapsed / duration, 1);
+                
+        //         // Smooth easing
+        //         const eased = progress < 0.5 ? 
+        //             2 * progress * progress : 
+        //             -1 + (4 - 2 * progress) * progress;
+
+        //         this.camera.position.lerpVectors(startPos, viewpoint.position, eased);
+        //         this.controls.target.lerpVectors(startTarget, viewpoint.target, eased);
+        //         this.controls.update();
+
+        //         if (progress < 1) {
+        //             requestAnimationFrame(animate);
+        //         } else {
+        //             resolve();
+        //         }
+        //     };
+        //     animate();
 
         return new Promise((resolve) => {
             const animate = () => {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                // Smooth easing
                 const eased = progress < 0.5 ? 
                     2 * progress * progress : 
                     -1 + (4 - 2 * progress) * progress;
 
                 this.camera.position.lerpVectors(startPos, viewpoint.position, eased);
-                this.controls.target.lerpVectors(startTarget, viewpoint.target, eased);
-                this.controls.update();
+                
+                // Make camera look at target
+                const lookAt = new THREE.Vector3(...viewpoint.target);
+                this.camera.lookAt(lookAt);
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
@@ -396,7 +435,9 @@ export class DitheredRoom {
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
-        this.controls.update();
+        if (this.controls) {
+            this.controls.update();
+        }
         
         // Use composer instead of renderer for dithering effect
         this.composer.render();
