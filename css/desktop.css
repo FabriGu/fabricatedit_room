@@ -77,6 +77,8 @@
     /* overflow: hidden; */
     /* position: relative; */
   }
+
+
   
   /* ----------------------------------------------------------- GENERAL */
   
@@ -298,8 +300,18 @@
   
   
   /* ----------------------------------------------------------- WORK CARDS */
+
   
-  #gallery-container-works {
+  
+  .title {
+    font-size: 6em;
+    text-align: center;
+
+    padding:5px 0;
+    color:#f3f3f3;
+  }
+  
+  #gallery-container-works, #gallery-container-music {
     position: absolute;
     top: 0;
     left: 0;
@@ -314,7 +326,7 @@
     /* justify-content: center; */
   }
   
-  #cards, #gallery-overlay-works {
+  #cards, #gallery-overlay-works, #gallery-overlay-music {
     width: 80%;
     display: flex;
     flex-direction: row;
@@ -323,6 +335,9 @@
     justify-content: flex-start !important;
   
     height: auto;
+  
+  position:relative;
+  z-index: 2;
   }
 
   
@@ -739,7 +754,7 @@
 
   /* --- change style */
   /* Modify the gallery container to have a more grainy/dithered look */
-#gallery-container-works {
+#gallery-container-works , #gallery-container-music {
     /* Keep your existing positioning */
     position: absolute;
     top: 0;
@@ -799,7 +814,7 @@
 }
 
 /* Add a subtle scan line effect */
-#gallery-container-works::after {
+#gallery-container-works::after, #gallery-container-music::after {
     content: "";
     position: fixed;
     top: 0;
@@ -830,8 +845,26 @@
 }
 
 /* Remove the global scanline effect */
-#gallery-container-works::after {
+#gallery-container-works::after, #gallery-container-music::after {
     display: none;
+}
+
+#gallery-overlay-music {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-around  !important; 
+    
+  
+  flex-wrap: wrap;
+
+
+}
+
+#gallery-overlay-music > .work-card {
+    /* a little smaller than before */
+    max-width: 35% !important;
+    /* flex-grow: 1; */
 }
 
 /* Add scanlines to text containers and make them fill the media container */

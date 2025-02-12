@@ -1,0 +1,12 @@
+{
+    "title": "Centro di gravità permanente",
+    "description": "By Franco Battiato",
+    "priority": 9,
+    "tags": ["Interactive", "Sewing", "3D Printing", "Physical Computing"],
+    "date": "2024-03",
+    "link": "https://project-url.com",
+    "githubLink": "https://github.com/username/project",
+    "technologies": ["JavaScript", "p5.js", "HTML", "CSS"],
+    "textCol": "black",
+    "type": "normal"
+}

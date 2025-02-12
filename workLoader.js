@@ -649,12 +649,29 @@ export class WorkLoader {
 
     async loadWorks() {
        // create title 
-       if (this.containerType === 'works') {
+       if (this.containerType == 'works') {
+        const titleContainer = document.createElement("div");
         const title = document.createElement("h3");
-        title.textContent = "Work";
-        title.classList.add("fontSecondary");
-        console.log('Creating title');
-        this.container.appendChild(title);
+        
+        title.innerHTML = "Work";
+        
+        // title.classList.add("fontSecondary");
+        title.className = 'title fontQuaternary';
+        console.log(title)
+        // console.log('Creating title');
+        // append as first item in the container
+
+        // this.container.insertAdjacentHTML( "afterbegin" ,title);
+        this.container.parentElement.insertBefore(title, this.container.parentElement.firstChild);
+        
+        // this.container.appendChild(titleContainer);
+        console.log(this.container)
+        
+       } else if (this.containerType == 'music') {
+        const title = document.createElement("h3");
+        title.innerHTML = "Music I Like";
+        title.className = 'title fontQuaternary';
+        this.container.parentElement.insertBefore(title, this.container.parentElement.firstChild);
         
        }
        // loading work data
