@@ -380,6 +380,7 @@ export class DitheredRoom {
                     resolve(gltf);
                 },
                 (progress) => {
+                    
                     console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
                     // show loading percentage on the loader screen
                     const loaderScreen = document.getElementById('loadingScreen');

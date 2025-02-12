@@ -4,17 +4,19 @@ import { WorkCard } from './workLoader.js';  // Make sure to import WorkCard too
 export class GalleryOverlay {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        this.containerType = this.container.id.substring(this.container.id.length-6)
+        // console.log(this.container.id.substring(this.container.id.length-6));
         this.isVisible = false;
         this.setupOverlay();
         // Create the workLoader with our works-container
-        this.workLoader = new WorkLoader('gallery-overlay');
+        this.workLoader = new WorkLoader('gallery-overlay' +`${this.container.id.substring(this.container.id.length-6)}`);
         this.worksLoader = false;
     }
 
     setupOverlay() {
         // const overlay = document.createElement('div');
         // overlay.className = 'gallery-overlay';
-        const overlay = document.querySelector('#gallery-overlay');
+        const overlay = document.querySelector('#gallery-overlay' + this.containerType);
         overlay.style.display = 'none';
         // const container = document.getElementById('gallery-container');
         this.container.style.display = 'none';

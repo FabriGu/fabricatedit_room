@@ -273,7 +273,7 @@
   
   /* ----------------------------------------------------------- WORK CARDS */
   
-  #gallery-container {
+  #gallery-container-works {
     position: absolute;
     top: 0;
     left: 0;
@@ -288,7 +288,7 @@
     /* justify-content: center; */
   }
   
-  #cards, #gallery-overlay {
+  #cards, #gallery-overlay-works {
     width: 80%;
     display: flex;
     flex-direction: row;
@@ -713,7 +713,7 @@
 
   /* --- change style */
   /* Modify the gallery container to have a more grainy/dithered look */
-#gallery-container {
+#gallery-container-works {
     /* Keep your existing positioning */
     position: absolute;
     top: 0;
@@ -773,7 +773,7 @@
 }
 
 /* Add a subtle scan line effect */
-#gallery-container::after {
+#gallery-container-works::after {
     content: "";
     position: fixed;
     top: 0;
@@ -804,7 +804,7 @@
 }
 
 /* Remove the global scanline effect */
-#gallery-container::after {
+#gallery-container-works::after {
     display: none;
 }
 
@@ -863,4 +863,51 @@
     padding: 1rem;
     width: 100%;
     text-align: center;
+}
+
+/* from index.html */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #000;
+}
+
+#roomContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: monospace;
+    font-size: 1.5em;
+    z-index: 1000;
+}
+
+.infoPopup {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 300px;
+    display: none;
+    z-index: 100;
 }
