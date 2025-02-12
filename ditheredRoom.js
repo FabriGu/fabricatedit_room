@@ -423,8 +423,38 @@ export class DitheredRoom {
                     console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
                     // show loading percentage on the loader screen
                     const loaderScreen = document.getElementById('loadingScreen');
-                    if (loaderScreen) {
-                        loaderScreen.innerText = 'Loading: ' + Math.round(progress.loaded / progress.total * 100) + '%';
+                    const loaderText = document.getElementById('loadingText');
+                    
+                    if (loaderText) {
+                        // loaderScreen
+                        // loaderScreen.innerText = 'Loading: ' + Math.round(progress.loaded / progress.total * 100) + '%';
+                        // switch case for accessing and displaying different loadingSentences on loading screen
+                        switch(Math.round(progress.loaded / progress.total * 100)) {
+                            case 0:
+                                loaderText.innerHTML = loadingSentences[0];
+                                break;
+                            case 25:
+                                loaderText.innerHTML = loadingSentences[1];
+                                break;
+                            case 50:
+                                loaderText.innerHTML = loadingSentences[2];
+                                break;
+                            case 75:
+                                loaderText.innerHTML = loadingSentences[3];
+                                break;
+                            case 100:
+                                loaderText.innerHTML = loadingSentences[4];
+                                break;
+                        }
+                        // loaderScreen.innerText 
+                        // show progress bar underneath
+                        // create a progress bar and place it inside loaderScreen
+                        // const progressBar = document.createElement('div');
+                        const progressBar = document.getElementById('progressBar');
+                        if (progressBar) {
+                            progressBar.style.width = Math.round(progress.loaded / progress.total * 100) + '%';
+                        }
+
                     }
 
                 },

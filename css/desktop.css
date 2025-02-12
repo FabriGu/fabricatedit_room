@@ -51,6 +51,32 @@
     /* -webkit-text-stroke: white 5px; */
     color: #333;
   }
+
+  /* ------------------------------------------------------------LOADING  */
+  #loadingScreen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    width: 40vw;
+  }
+
+  #loadingText {
+
+    color: white;
+  }
+  #progressBar {
+    /* width: 100%; */
+    margin-top: 20px;;
+    height: 20px;
+    background-color: #f3f3f3;
+    border: 2px solid #fff;
+    align-self: start;
+    /* border-radius: 5px; */
+    /* overflow: hidden; */
+    /* position: relative; */
+  }
   
   /* ----------------------------------------------------------- GENERAL */
   
