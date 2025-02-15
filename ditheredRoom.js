@@ -80,6 +80,7 @@ export class DitheredRoom {
     }
 
 
+
     setupPostProcessing() {
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(new RenderPass(this.scene, this.camera));
@@ -198,24 +199,22 @@ export class DitheredRoom {
         this.container.addEventListener('click', handleInteraction);
         this.container.addEventListener('touchstart', handleInteraction, { passive: false });
     
-        // Hover effects (mouse only)
+         // Update the mousemove event handler
         this.container.addEventListener('mousemove', (event) => {
             this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    
+
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
-    
+
             this.interactiveObjects.forEach(obj => {
-                if (obj.material) {
-                    obj.material.opacity = 0.7;
-                }
+                obj.userData.isHovered = false;
             });
-    
+
             if (intersects.length > 0) {
                 const object = intersects[0].object;
-                if (object.material) {
-                    object.material.opacity = 1;
+                if (object.userData.callback) {
+                    object.userData.isHovered = true;
                 }
             }
         });
@@ -269,20 +268,103 @@ export class DitheredRoom {
         });
     }
 
+    // async goToViewpoint(name) {
+    //     const viewpoint = this.viewpoints.get(name);
+    //     if (!viewpoint) return;
+
+    //     this.currentViewpoint = name;
+
+    //     // Apply restrictions
+    //     // this.controls.minAzimuth = viewpoint.restrictions.minAzimuth;
+    //     // this.controls.maxAzimuth = viewpoint.restrictions.maxAzimuth;
+    //     // this.controls.minPolarAngle = viewpoint.restrictions.minPolarAngle;
+    //     // this.controls.maxPolarAngle = viewpoint.restrictions.maxPolarAngle;
+    //     // this.controls.minDistance = viewpoint.restrictions.minDistance;
+    //     // this.controls.maxDistance = viewpoint.restrictions.maxDistance;
+
+    //     this.controls.bounds = new THREE.Box3(
+    //         new THREE.Vector3(
+    //             viewpoint.position.x - viewpoint.restrictions.maxDistance,
+    //             viewpoint.restrictions.minPolarAngle,
+    //             viewpoint.position.z - viewpoint.restrictions.maxDistance
+    //         ),
+    //         new THREE.Vector3(
+    //             viewpoint.position.x + viewpoint.restrictions.maxDistance,
+    //             viewpoint.restrictions.maxPolarAngle,
+    //             viewpoint.position.z + viewpoint.restrictions.maxDistance
+    //         )
+    //     );
+
+    //     // Smoothly move camera to new position
+    //     const startPos = this.camera.position.clone();
+    //     // const startTarget = this.controls.target.clone();
+    //     const duration = 1000; // 1 second transition
+    //     const startTime = Date.now();
+
+    //     // return new Promise((resolve) => {
+    //     //     const animate = () => {
+    //     //         const elapsed = Date.now() - startTime;
+    //     //         const progress = Math.min(elapsed / duration, 1);
+                
+    //     //         // Smooth easing
+    //     //         const eased = progress < 0.5 ? 
+    //     //             2 * progress * progress : 
+    //     //             -1 + (4 - 2 * progress) * progress;
+
+    //     //         this.camera.position.lerpVectors(startPos, viewpoint.position, eased);
+    //     //         this.controls.target.lerpVectors(startTarget, viewpoint.target, eased);
+    //     //         this.controls.update();
+
+    //     //         if (progress < 1) {
+    //     //             requestAnimationFrame(animate);
+    //     //         } else {
+    //     //             resolve();
+    //     //         }
+    //     //     };
+    //     //     animate();
+
+    //     return new Promise((resolve) => {
+    //         const animate = () => {
+    //             const elapsed = Date.now() - startTime;
+    //             const progress = Math.min(elapsed / duration, 1);
+                
+    //             const eased = progress < 0.5 ? 
+    //                 2 * progress * progress : 
+    //                 -1 + (4 - 2 * progress) * progress;
+
+    //             this.camera.position.lerpVectors(startPos, viewpoint.position, eased);
+                
+    //             // Make camera look at target
+    //             const lookAt = new THREE.Vector3(...viewpoint.target);
+    //             this.camera.lookAt(lookAt);
+    //             // console.log(lookAt)
+
+    //             // console.log("Camera after viewpoint set:", {
+    //             //     quaternion: this.camera.quaternion.clone(),
+    //             //     euler: new THREE.Euler().setFromQuaternion(this.camera.quaternion, 'YXZ')
+
+    //             // });
+
+    //             this.controls.updateRotation(this.camera.quaternion);
+    //             if (progress < 1) {
+    //                 requestAnimationFrame(animate);
+    //             } else {
+    //                 resolve();
+    //             }
+    //         };
+    //         animate();
+    //     });
+    // }
+
+// Replace the existing goToViewpoint method in DitheredRoom class with this improved version
+
     async goToViewpoint(name) {
         const viewpoint = this.viewpoints.get(name);
         if (!viewpoint) return;
 
         this.currentViewpoint = name;
 
-        // Apply restrictions
-        // this.controls.minAzimuth = viewpoint.restrictions.minAzimuth;
-        // this.controls.maxAzimuth = viewpoint.restrictions.maxAzimuth;
-        // this.controls.minPolarAngle = viewpoint.restrictions.minPolarAngle;
-        // this.controls.maxPolarAngle = viewpoint.restrictions.maxPolarAngle;
-        // this.controls.minDistance = viewpoint.restrictions.minDistance;
-        // this.controls.maxDistance = viewpoint.restrictions.maxDistance;
-
+        // Update control restrictions
         this.controls.bounds = new THREE.Box3(
             new THREE.Vector3(
                 viewpoint.position.x - viewpoint.restrictions.maxDistance,
@@ -296,102 +378,209 @@ export class DitheredRoom {
             )
         );
 
-        // Smoothly move camera to new position
+        // Get current camera state
         const startPos = this.camera.position.clone();
-        // const startTarget = this.controls.target.clone();
-        const duration = 1000; // 1 second transition
+        const startQuat = this.camera.quaternion.clone();
+        
+        // Create target quaternion by looking at the target point
+        const targetPos = new THREE.Vector3(...viewpoint.target);
+        const tempCamera = new THREE.PerspectiveCamera();
+        tempCamera.position.copy(viewpoint.position);
+        tempCamera.lookAt(targetPos);
+        const targetQuat = tempCamera.quaternion;
+
+        // Calculate a smooth path using cubic Bezier curve
+        const midPoint = startPos.clone().lerp(viewpoint.position, 0.5);
+        const heightOffset = Math.min(startPos.distanceTo(viewpoint.position) * 0.25, 2);
+        
+        const controlPoint1 = startPos.clone().lerp(midPoint, 0.33);
+        controlPoint1.y += heightOffset;
+        
+        const controlPoint2 = startPos.clone().lerp(midPoint, 0.66);
+        controlPoint2.y += heightOffset;
+
+        const curve = new THREE.CubicBezierCurve3(
+            startPos,
+            controlPoint1,
+            controlPoint2,
+            viewpoint.position
+        );
+
+        // Animation settings
+        const duration = 1500; // 1.5 seconds
         const startTime = Date.now();
-
-        // return new Promise((resolve) => {
-        //     const animate = () => {
-        //         const elapsed = Date.now() - startTime;
-        //         const progress = Math.min(elapsed / duration, 1);
-                
-        //         // Smooth easing
-        //         const eased = progress < 0.5 ? 
-        //             2 * progress * progress : 
-        //             -1 + (4 - 2 * progress) * progress;
-
-        //         this.camera.position.lerpVectors(startPos, viewpoint.position, eased);
-        //         this.controls.target.lerpVectors(startTarget, viewpoint.target, eased);
-        //         this.controls.update();
-
-        //         if (progress < 1) {
-        //             requestAnimationFrame(animate);
-        //         } else {
-        //             resolve();
-        //         }
-        //     };
-        //     animate();
 
         return new Promise((resolve) => {
             const animate = () => {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                const eased = progress < 0.5 ? 
-                    2 * progress * progress : 
-                    -1 + (4 - 2 * progress) * progress;
+                // Smooth easing function
+                const eased = progress < 0.5 
+                    ? 4 * progress * progress * progress 
+                    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-                this.camera.position.lerpVectors(startPos, viewpoint.position, eased);
-                
-                // Make camera look at target
-                const lookAt = new THREE.Vector3(...viewpoint.target);
-                this.camera.lookAt(lookAt);
-                // console.log(lookAt)
+                // Get position along the curve
+                const point = curve.getPoint(eased);
+                this.camera.position.copy(point);
 
-                // console.log("Camera after viewpoint set:", {
-                //     quaternion: this.camera.quaternion.clone(),
-                //     euler: new THREE.Euler().setFromQuaternion(this.camera.quaternion, 'YXZ')
+                // Interpolate rotation using quaternion slerp
+                const resultQuat = new THREE.Quaternion();
+                resultQuat.slerpQuaternions(startQuat, targetQuat, eased);
+                this.camera.quaternion.copy(resultQuat);
 
-                // });
-
+                // Update controls to match new camera state
                 this.controls.updateRotation(this.camera.quaternion);
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
+                    // Ensure we end exactly at the target
+                    this.camera.position.copy(viewpoint.position);
+                    this.camera.quaternion.copy(targetQuat);
+                    this.controls.updateRotation(this.camera.quaternion);
                     resolve();
                 }
             };
             animate();
         });
     }
+    
+    // Add this helper method to calculate optimal control points for the Bezier curve
+    calculateControlPoints(start, end, heightFactor = 0.5) {
+        const midPoint = start.clone().lerp(end, 0.5);
+        const distance = start.distanceTo(end);
+        
+        // Calculate control points that create a natural arc
+        const control1 = start.clone().lerp(midPoint, 0.33);
+        control1.y += distance * heightFactor;
+        
+        const control2 = start.clone().lerp(midPoint, 0.66);
+        control2.y += distance * heightFactor;
+        
+        return [control1, control2];
+    }
+
+    // addInteractiveItem(position, callback, type = 'default') {
+    //     const geometries = {
+    //         default: new THREE.BoxGeometry(0.3, 0.3, 0.3),
+    //         viewpoint: new THREE.SphereGeometry(0.2, 16, 16),
+    //         info: new THREE.ConeGeometry(0.2, 0.4, 16)
+    //     };
+
+    //     const materials = {
+    //         default: new THREE.MeshBasicMaterial({ 
+    //             color: 0xffff00,
+    //             transparent: true,
+    //             opacity: 0.7
+    //         }),
+    //         viewpoint: new THREE.MeshBasicMaterial({ 
+    //             color: 0xa32cc4, //0x8a00c2
+    //             transparent: true,
+    //             opacity: 1
+    //         }),
+    //         info: new THREE.MeshBasicMaterial({ 
+    //             color: 0xff0000,
+    //             transparent: true,
+    //             opacity: 0.7
+    //         })
+    //     };
+
+    //     const item = new THREE.Mesh(
+    //         geometries[type] || geometries.default,
+    //         materials[type] || materials.default
+    //     );
+    //     item.position.copy(position);
+    //     item.userData.callback = callback;
+    //     item.userData.type = type;
+    //     this.scene.add(item);
+    //     this.interactiveObjects.push(item);
+
+    //     return item;
+    // }
 
     addInteractiveItem(position, callback, type = 'default') {
         const geometries = {
             default: new THREE.BoxGeometry(0.3, 0.3, 0.3),
-            viewpoint: new THREE.SphereGeometry(0.2, 16, 16),
-            info: new THREE.ConeGeometry(0.2, 0.4, 16)
+            viewpoint: new THREE.SphereGeometry(0.2, 32, 32), // Increased segments for smoother glow
+            info: new THREE.ConeGeometry(0.2, 0.4, 32)
         };
-
-        const materials = {
-            default: new THREE.MeshBasicMaterial({ 
-                color: 0xffff00,
-                transparent: true,
-                opacity: 0.7
-            }),
-            viewpoint: new THREE.MeshBasicMaterial({ 
-                color: 0x8a00c2,
-                transparent: true,
-                opacity: 0.7
-            }),
-            info: new THREE.MeshBasicMaterial({ 
-                color: 0xff0000,
-                transparent: true,
-                opacity: 0.7
-            })
+    
+        const getGlowColor = (type) => {
+            switch(type) {
+                case 'viewpoint': return new THREE.Color(0x8a00c2); // Purple
+                case 'info': return new THREE.Color(0xff0000);      // Red
+                default: return new THREE.Color(0xffff00);          // Yellow
+            }
         };
-
+    
+        const material = new GlowingSphereMaterial(getGlowColor(type));
+        
         const item = new THREE.Mesh(
             geometries[type] || geometries.default,
-            materials[type] || materials.default
+            material
         );
+    
+        // Add a point light to create actual light emission
+        const pointLight = new THREE.PointLight(
+            getGlowColor(type),
+            0.5, // Intensity
+            1    // Distance
+        );
+        pointLight.position.copy(position);
+        this.scene.add(pointLight);
+    
+        // Create a bigger, transparent sphere for the glow effect
+        const glowGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+        const glowMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                glowColor: { value: getGlowColor(type) }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 glowColor;
+                uniform float time;
+                varying vec3 vNormal;
+                
+                void main() {
+                    float intensity = pow(0.8 - dot(vNormal, vec3(0, 0, 1.0)), 2.0);
+                    gl_FragColor = vec4(glowColor, intensity * 0.5 * (0.8 + 0.2 * sin(time * 2.0)));
+                }
+            `,
+            transparent: true,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending
+        });
+    
+        const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+        // item.add(glowMesh);
+    
+        // Animate glow
+        const animateGlow = () => {
+            glowMaterial.uniforms.time.value = Date.now() * 0.001;
+            requestAnimationFrame(animateGlow);
+        };
+        animateGlow();
+    
         item.position.copy(position);
         item.userData.callback = callback;
         item.userData.type = type;
+        
+        // Add hover animation
+        item.userData.originalScale = item.scale.clone();
+        item.userData.targetScale = item.scale.clone().multiplyScalar(1.2);
+        item.userData.currentScale = item.scale.clone();
+        
         this.scene.add(item);
         this.interactiveObjects.push(item);
-
+    
         return item;
     }
 
@@ -492,11 +681,20 @@ export class DitheredRoom {
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
+        
+        // Update interactive objects animations
+        this.interactiveObjects.forEach(obj => {
+            if (obj.userData.isHovered) {
+                obj.scale.lerp(obj.userData.targetScale, 0.1);
+            } else {
+                obj.scale.lerp(obj.userData.originalScale, 0.1);
+            }
+        });
+    
         if (this.controls) {
             this.controls.update();
         }
         
-        // Use composer instead of renderer for dithering effect
         this.composer.render();
     }
 
@@ -533,4 +731,69 @@ export class DitheredRoom {
 
     // ... (keep all other methods from the previous version)
 
+
+    class GlowingSphereMaterial extends THREE.ShaderMaterial {
+        constructor(color = new THREE.Color(0x8a00c2)) {
+            super({
+                uniforms: {
+                    time: { value: 0 },
+                    baseColor: { value: color },
+                    glowColor: { value: new THREE.Color(0xffffff) },
+                    glowIntensity: { value: 0.5 },
+                    pulseSpeed: { value: 2.0 }
+                },
+                vertexShader: `
+                    varying vec3 vNormal;
+                    varying vec3 vViewPosition;
+                    
+                    void main() {
+                        vNormal = normalize(normalMatrix * normal);
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        vViewPosition = -mvPosition.xyz;
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 baseColor;
+                    uniform vec3 glowColor;
+                    uniform float glowIntensity;
+                    uniform float time;
+                    uniform float pulseSpeed;
+                    
+                    varying vec3 vNormal;
+                    varying vec3 vViewPosition;
+                    
+                    void main() {
+                        float pulse = 0.5 * (1.0 + sin(time * pulseSpeed));
+                        
+                        // Fresnel effect for edge glow
+                        vec3 normal = normalize(vNormal);
+                        vec3 viewDir = normalize(vViewPosition);
+                        float fresnel = pow(1.0 - abs(dot(normal, viewDir)), 1.5);
+                        
+                        // Combine base color with pulsing glow
+                        vec3 finalColor = mix(baseColor, glowColor, fresnel * glowIntensity * pulse);
+                        
+                        // Add extra brightness at edges
+                        float edgeGlow = pow(fresnel, 3.0) * pulse;
+                        finalColor += glowColor * edgeGlow;
+                        
+                        gl_FragColor = vec4(finalColor, 0.8);
+                    }
+                `,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+    
+            // Start the animation
+            this.startTime = Date.now();
+            this.animate = this.animate.bind(this);
+            this.animate();
+        }
+    
+        animate() {
+            this.uniforms.time.value = (Date.now() - this.startTime) * 0.001;
+            requestAnimationFrame(this.animate);
+        }
+    }
     

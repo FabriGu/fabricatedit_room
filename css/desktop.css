@@ -464,7 +464,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    width: 80%;
+    width: 40%;
   
   }
   
@@ -857,6 +857,7 @@
     
   
   flex-wrap: wrap;
+  max-width:70%;
 
 
 }
@@ -864,6 +865,7 @@
 #gallery-overlay-music > .work-card {
     /* a little smaller than before */
     max-width: 35% !important;
+    /* margin:0px !important; */
     /* flex-grow: 1; */
 }
 
