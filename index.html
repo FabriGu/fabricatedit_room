@@ -16,12 +16,16 @@
         }
     }
     </script>
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
+
     
 </head>
 <body>
     <script>
         const loadingSentences = ["Folding laundry", "Tidying desk","Watering plants", "Cleaning Windows","Arranging trinkets",  "Dusting Shelves"];
     </script>
+    
     <script type="module" src="galleryOverlay.js"></script>
     <script type="module" src="enhancedControls.js"></script>
     <div id="loadingScreen" >
@@ -37,10 +41,22 @@
     </div>
     <div id="gallery-container-music">
         <div id="gallery-overlay-music">
-
+            <div id="embed-iframe"></div>
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6R3b2zxMXNARX1jQ6irKpq?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
     <div id="infoPopup" class="infoPopup"></div>
+
+    <script>
+        window.onSpotifyIframeApiReady = (IFrameAPI) => {
+        const element = document.getElementById('embed-iframe');
+        const options = {
+            uri: 'spotify:episode:7makk4oTQel546B0PZlDM5'
+            };
+        const callback = (EmbedController) => {};
+        IFrameAPI.createController(element, options, callback);
+        };
+    </script>
 
     <script type="module">
         
@@ -66,7 +82,7 @@
                     maxDistance: 5
                 });
                 
-                room.addViewpoint('Wardrobe', [-1, 1, -2],[1, 0, 0], {
+                room.addViewpoint('Wardrobe', [0, 0, 0],[0, 0, 0], {
                     minPolarAngle: Math.PI / 4,
                     maxPolarAngle: Math.PI * 0.6,
                     minDistance: 2,
@@ -112,7 +128,8 @@
                 await room.goToViewpoint('Desk');
                 galleryWork.show();
             },
-            'viewpoint'
+            'viewpoint',
+            'WORK'
         );
 
         // initialize gallery overlay for music 
@@ -127,7 +144,19 @@
                 await room.goToViewpoint('Albums');
                 galleryMusic.show();
             },
-            'viewpoint'
+            'viewpoint',
+            'MUSIC'
+        );
+
+        room.addInteractiveItem(
+            new THREE.Vector3(0, 0, 0),
+            async () => {
+                await room.goToViewpoint('Wardrobe');
+                galleryMusic.show();
+            },
+            'viewpoint',
+            'FASHION',
+        
         );
 
                 

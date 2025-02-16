@@ -499,7 +499,7 @@ export class DitheredRoom {
     //     return item;
     // }
 
-    addInteractiveItem(position, callback, type = 'default') {
+    addInteractiveItem(position, callback, type = 'default', labelText = '', textSize = null) {
         const geometries = {
             default: new THREE.BoxGeometry(0.3, 0.3, 0.3),
             viewpoint: new THREE.SphereGeometry(0.2, 32, 32), // Increased segments for smoother glow
@@ -561,6 +561,29 @@ export class DitheredRoom {
     
         const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
         // item.add(glowMesh);
+
+        // Add text if provided
+        if (labelText) {
+            // Define default sizes for different types of text
+            const defaultSizes = {
+                'FASHION': 0.13,
+                'MUSIC': 0.18,
+                'WORK': 0.18
+            };
+            // Use provided size, or lookup from defaults, or use general default
+            const finalTextSize = textSize || defaultSizes[labelText] || 0.15;
+            const maxWidth = 1.8; // Maximum width for any text
+            
+            const billboardText = new BillboardText(labelText, finalTextSize, maxWidth);
+            billboardText.setSphereCenter(position);
+            this.scene.add(billboardText);
+            item.userData.billboardText = billboardText;
+            // const textSize = 0.2; // Slightly larger for better visibility
+            // const billboardText = new BillboardText(labelText, textSize);
+            // billboardText.setSphereCenter(position);
+            // this.scene.add(billboardText); // Add to scene instead of sphere
+            // item.userData.billboardText = billboardText;
+        }
     
         // Animate glow
         const animateGlow = () => {
@@ -679,18 +702,34 @@ export class DitheredRoom {
         });
     }
 
+    // Update the animate method to include text billboard updates
+    
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         
         // Update interactive objects animations
         this.interactiveObjects.forEach(obj => {
+            // Scale animation
             if (obj.userData.isHovered) {
                 obj.scale.lerp(obj.userData.targetScale, 0.1);
             } else {
                 obj.scale.lerp(obj.userData.originalScale, 0.1);
             }
+            
+            // Update billboard text
+            if (obj.userData.billboardText) {
+                // Update text position and orientation
+                obj.userData.billboardText.update(this.camera);
+                
+                // Optional: Make text more visible when sphere is hovered
+                const textMaterial = obj.userData.billboardText.sprite.material;
+                textMaterial.opacity = obj.userData.isHovered ? 1 : 0.9;
+                // make text move further out from sphere when hovered
+                obj.userData.billboardText.offsetDistance = obj.userData.isHovered ? 0.8 : 0.3;
+                
+            }
         });
-    
+
         if (this.controls) {
             this.controls.update();
         }
@@ -797,3 +836,93 @@ export class DitheredRoom {
         }
     }
     
+    // Updated BillboardText class with surface-tangent orientation
+class BillboardText extends THREE.Object3D {
+    constructor(text, size = 0.25, maxWidth = 1) {
+        super();
+
+        // Create canvas for text rendering
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        
+        // Set canvas size with proper aspect ratio
+        canvas.width = 512;
+        canvas.height = 512;
+
+        // Configure text style
+        context.fillStyle = 'white';
+        context.font = "bold 64px 'scandia-line-web'";
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        
+        // Measure text
+        const textMetrics = context.measureText(text);
+        const textWidth = textMetrics.width;
+        
+        // Calculate scale to fit maxWidth
+        const baseScale = size * (textWidth / 64);
+        const finalScale = Math.min(baseScale, maxWidth);
+        
+        // Scale font size if needed to fit maxWidth
+        const scaledFontSize = Math.floor(64 * (finalScale / baseScale));
+        context.font = `bold ${scaledFontSize}px 'scandia-line-web'`;
+        
+        // Clear canvas and draw text
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+        // Create texture from canvas
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.needsUpdate = true;
+
+        // Create material with transparency
+        const material = new THREE.SpriteMaterial({
+            map: texture,
+            transparent: true,
+            depthWrite: false,
+            depthTest: true,
+            opacity: 0.9
+        });
+
+        // Create sprite with proper scaling
+        this.sprite = new THREE.Sprite(material);
+        // Maintain aspect ratio while fitting within maxWidth
+        const aspectRatio = canvas.width / canvas.height;
+        this.sprite.scale.set(finalScale, finalScale / aspectRatio, 1);
+
+        this.add(this.sprite);
+        
+        // Store sphere center for positioning
+        this.sphereCenter = new THREE.Vector3();
+        this.sphereRadius = 0.2;
+        this.offsetDistance = this.sphereRadius * 0.7;
+    }
+
+    update(camera) {
+        // Get direction from sphere center to camera
+        const directionToCamera = new THREE.Vector3().subVectors(camera.position, this.sphereCenter).normalize();
+        
+        // Calculate position between sphere center and camera
+        const textPosition = this.sphereCenter.clone();
+        textPosition.addScaledVector(directionToCamera, this.offsetDistance);
+        this.position.copy(textPosition);
+
+        // Calculate surface normal at the text position relative to sphere center
+        const surfaceNormal = new THREE.Vector3().subVectors(this.position, this.sphereCenter).normalize();
+        
+        // Calculate tangent basis vectors
+        const up = new THREE.Vector3(0, 1, 0);
+        const right = new THREE.Vector3().crossVectors(surfaceNormal, up).normalize();
+        const tangentUp = new THREE.Vector3().crossVectors(right, surfaceNormal).normalize();
+        
+        // Create rotation matrix from basis vectors
+        const rotationMatrix = new THREE.Matrix4().makeBasis(right, tangentUp, surfaceNormal);
+        this.quaternion.setFromRotationMatrix(rotationMatrix);
+    }
+
+    setSphereCenter(center) {
+        this.sphereCenter.copy(center);
+    }
+}
+
+// Rest of the code remains the same
