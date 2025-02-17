@@ -41,8 +41,24 @@
     </div>
     <div id="gallery-container-music">
         <div id="gallery-overlay-music">
-            <div id="embed-iframe"></div>
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6R3b2zxMXNARX1jQ6irKpq?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <div class="work-card"id="embed-iframe"></div>
+            <div class="spotify-wrapper">
+                <iframe 
+                    src="https://open.spotify.com/embed/playlist/6R3b2zxMXNARX1jQ6irKpq?utm_source=generator&theme=0" 
+                    width="100%" 
+                    style="border-radius:0px !important;"
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+                </iframe>
+
+            </div>
+        </div>
+    </div>
+    <div id ="gallery-container-fasho">
+        <div id="gallery-overlay-fasho">
+
         </div>
     </div>
     <div id="infoPopup" class="infoPopup"></div>
@@ -51,7 +67,7 @@
         window.onSpotifyIframeApiReady = (IFrameAPI) => {
         const element = document.getElementById('embed-iframe');
         const options = {
-            uri: 'spotify:episode:7makk4oTQel546B0PZlDM5'
+            uri: 'https://open.spotify.com/track/1Jd9W7k8DTnBSovDSxK77n?si=97ad4c6247154535'
             };
         const callback = (EmbedController) => {};
         IFrameAPI.createController(element, options, callback);
@@ -82,7 +98,7 @@
                     maxDistance: 5
                 });
                 
-                room.addViewpoint('Wardrobe', [0, 0, 0],[0, 0, 0], {
+                room.addViewpoint('Wardrobe', [-1, 0, 0],[0, 0, 0], {
                     minPolarAngle: Math.PI / 4,
                     maxPolarAngle: Math.PI * 0.6,
                     minDistance: 2,
@@ -118,6 +134,7 @@
 
         // Initialize gallery overlay for work stuff
         const galleryWork = new GalleryOverlay('gallery-container-works');
+        const galleryFashion = new GalleryOverlay('gallery-container-fasho');
 
         galleryWork.setCloseCallback(() => room.goToViewpoint('Entrance'));
 
@@ -152,7 +169,7 @@
             new THREE.Vector3(0, 0, 0),
             async () => {
                 await room.goToViewpoint('Wardrobe');
-                galleryMusic.show();
+                galleryFashion.show();
             },
             'viewpoint',
             'FASHION',
@@ -174,7 +191,7 @@
                 // );
                 
                 // Load the model
-                await room.loadModel('./scans/room0.glb');
+                await room.loadModel('./scans/Room_2.glb');
                 
                 // Go to initial viewpoint
                 await room.goToViewpoint('Entrance');

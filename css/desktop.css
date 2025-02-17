@@ -862,6 +862,22 @@
 
 }
 
+#gallery-overlay-music > * {
+  margin: 2rem 0;
+    /* padding: 2rem; */
+    /* margin-left: 5vw !important; */
+    /* margin-right: 5vw !important; */
+    
+    /* Add a subtle pixelated border */
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
+    /* background: rgba(0, 0, 0, 0.3); */
+    border-radius: 0px !important;
+}
+
+#spotify > * {
+  border-radius: 0px !important;
+}
+
 #gallery-overlay-music > .work-card {
     /* a little smaller than before */
     max-width: 35% !important;
@@ -972,3 +988,100 @@ body {
     display: none;
     z-index: 100;
 }
+
+/*  spotify */
+/* Add these styles to your CSS */
+
+/* Spotify iframe wrapper */
+.spotify-wrapper {
+  flex-grow: 1;
+  margin: 2rem 0;
+  /* border: 1px solid rgba(255, 255, 255, 0.2); */
+  /* background: rgba(0, 0, 0, 0.3); */
+  transition: transform 0.15s steps(5);
+  width: 70% !important;
+  /* max-width: 35%; */
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+.spotify-wrapper:hover {
+  transform: translateY(-4px);
+}
+
+/* Remove all border-radius and adjust iframe sizing */
+.spotify-wrapper iframe {
+  /* border: 1px solid rgba(255, 255, 255, 0.15) !important; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important; */
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  /* background: transparent; */
+  /* filter: grayscale(0.3) contrast(1.1); */
+
+  aspect-ratio: 16/9;
+}
+
+/* Force remove border-radius from all Spotify elements */
+.spotify-wrapper iframe *,
+.spotify-wrapper iframe > *,
+.spotify-wrapper *, 
+.spotify-wrapper > *,
+.spotify-wrapper > *{
+  border-radius: 0px !important;
+}
+
+#gallery-overlay-music {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around !important;
+  flex-wrap: wrap;
+  max-width: 70%;
+  gap: 2rem;
+}
+
+.spotify-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 2px
+  ); */
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+.spotify-wrapper ::-webkit-scrollbar {
+  width: 8px;
+  /* background: rgba(0, 0, 0, 0.3); */
+}
+
+.spotify-wrapper ::-webkit-scrollbar-thumb {
+  /* background: rgba(255, 255, 255, 0.2); */
+  /* border: 1px solid rgba(255, 255, 255, 0.15); */
+  border-radius: 0;
+}
+
+/* Ensure proper spacing */
+.spotify-wrapper + .spotify-wrapper {
+  margin-left: 2rem;
+}
+
+.TrackWidget_widgetContainer__gADzr {
+  border-radius: 0px !important;
+}
+
+#_next > div > div {
+  border-radius: 0px !important;
+}
+

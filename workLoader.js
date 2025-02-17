@@ -673,6 +673,13 @@ export class WorkLoader {
         title.className = 'title fontQuaternary';
         this.container.parentElement.insertBefore(title, this.container.parentElement.firstChild);
         
+        return;
+       } else if (this.containerType == 'fasho') {
+        const title = document.createElement("h3");
+        title.innerHTML = "Fashion";
+        title.className = 'title fontQuaternary';
+        this.container.parentElement.insertBefore(title, this.container.parentElement.firstChild);
+        
        }
        // loading work data
        console.log('Loading works data');
