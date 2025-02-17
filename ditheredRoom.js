@@ -68,13 +68,13 @@ export class DitheredRoom {
         // Add grid helper after this line:
         // this.scene = new THREE.Scene();
 
-        // Add these lines:
-        const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0x444444);
-        this.scene.add(gridHelper);
+        // // Add these lines:
+        // const gridHelper = new THREE.GridHelper(20, 20, 0x888888, 0x444444);
+        // this.scene.add(gridHelper);
 
-        // Optional: Add axis helper to show X (red), Y (green), Z (blue) directions
-        const axisHelper = new THREE.AxesHelper(5);
-        this.scene.add(axisHelper);
+        // // Optional: Add axis helper to show X (red), Y (green), Z (blue) directions
+        // const axisHelper = new THREE.AxesHelper(5);
+        // this.scene.add(axisHelper);
 
 
     }
@@ -113,7 +113,7 @@ export class DitheredRoom {
                     float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
                     
                     // Skip dithering for very dark areas
-                    if (luminance < 0.02) {
+                    if (luminance < 0.01) {
                         gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
                         return;
                     }
@@ -652,7 +652,7 @@ export class DitheredRoom {
                     gltf.scene.position.y -= center.y;
                     gltf.scene.position.z -= center.z;
                     // rotate the model in z axis
-                    gltf.scene.rotation.y = 0.8;
+                    gltf.scene.rotation.y = 0.6;
                     
                     this.scene.add(gltf.scene);
                     resolve(gltf);
