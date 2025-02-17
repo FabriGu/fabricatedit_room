@@ -11,6 +11,8 @@ export class GalleryOverlay {
         // Create the workLoader with our works-container
         this.workLoader = new WorkLoader('gallery-overlay' +`${this.container.id.substring(this.container.id.length-6)}`);
         this.worksLoader = false;
+
+        this.room = null;
     }
 
     setupOverlay() {
@@ -41,20 +43,45 @@ export class GalleryOverlay {
 
 
         // Add click listener to the container (the parent element)
+        // Modify the container click listener to show spheres
         this.container.addEventListener('click', (event) => {
             if (this.isVisible && !this.overlay.contains(event.target)) {
                 this.hide();
+                // Show all spheres when clicking outside overlay
+                console.log(window.globalRoom)
+                console.log(this.room)
+                if (window.globalRoom) {
+                    window.globalRoom.interactiveObjects.forEach(obj => {
+                        console.log(obj)
+                        obj.visible = true;
+                        if (obj.userData.billboardText) {
+                            obj.userData.billboardText.visible = true;
+                        }
+                    });
+                }
                 if (this.onClose) {
                     this.onClose();
                 }
             }
         });
 
+
         // Prevent clicks on the works container from triggering the close
         this.overlay.addEventListener('click', (event) => {
             event.stopPropagation();
         });
     }
+
+    // Add method to set room reference
+    setRoom(room) {
+        if (!room) {
+            console.error('Attempted to set null/undefined room');
+            return;
+        }
+        console.log('Setting room:', room);
+        this.room = room;
+    }
+
 
     async show() {
         // First load the works if they haven't been loaded
@@ -78,6 +105,17 @@ export class GalleryOverlay {
         this.overlay.classList.remove('visible');
         this.container.classList.remove('visible');
         this.isVisible = false;
+        
+        // Show all spheres when gallery is hidden
+        if (window.globalRoom) {
+            window.globalRoom.interactiveObjects.forEach(obj => {
+                obj.visible = true;
+                if (obj.userData.billboardText) {
+                    obj.userData.billboardText.visible = true;
+                }
+            });
+        }
+    
         setTimeout(() => {
             this.overlay.style.display = 'none';
             this.container.style.display = 'none';

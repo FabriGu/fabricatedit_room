@@ -81,10 +81,15 @@
         
         // import { GalleryOverlay} from './galleryOverlay.js';
         import * as THREE from 'three';
+        window.globalRoom = null;
         
         window.addEventListener('load', async () => {
             try {
+                
                 const room = new DitheredRoom('roomContainer');
+                window.globalRoom = room;  // Store reference globally
+                // Set room reference for each gallery
+               
 
                 // Define viewpoints
                 // [x,  y, z], [lookX, lookY, lookZ]
@@ -132,11 +137,15 @@
                 //     'viewpoint'
                 // );
 
+                await new Promise(resolve => setTimeout(resolve, 100));
+
         // Initialize gallery overlay for work stuff
         const galleryWork = new GalleryOverlay('gallery-container-works');
-        const galleryFashion = new GalleryOverlay('gallery-container-fasho');
+        galleryWork.setRoom(room);
+                
 
         galleryWork.setCloseCallback(() => room.goToViewpoint('Entrance'));
+
 
         // await gallery.loadWorks();  // Load the works data
         room.addInteractiveItem(
@@ -151,6 +160,8 @@
 
         // initialize gallery overlay for music 
         const galleryMusic = new GalleryOverlay('gallery-container-music');
+        
+        galleryMusic.setRoom(room);
 
         galleryMusic.setCloseCallback(() => room.goToViewpoint('Entrance'));
 
@@ -164,6 +175,10 @@
             'viewpoint',
             'MUSIC'
         );
+
+        const galleryFashion = new GalleryOverlay('gallery-container-fasho');
+        galleryFashion.setRoom(room);
+        galleryFashion.setCloseCallback(() => room.goToViewpoint('Entrance'));
 
         room.addInteractiveItem(
             new THREE.Vector3(-0.7, 0, 0.3),

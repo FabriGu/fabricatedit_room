@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -172,15 +171,13 @@ export class DitheredRoom {
     
         // Handle both mouse clicks and touch events
         const handleInteraction = (event) => {
-            event.preventDefault(); // Prevent default touch behavior
+            event.preventDefault();
             
-            // Get the correct coordinates whether it's touch or mouse
             const x = event.clientX || (event.touches && event.touches[0] ? event.touches[0].clientX : null);
             const y = event.clientY || (event.touches && event.touches[0] ? event.touches[0].clientY : null);
             
             if (x === null || y === null) return;
     
-            // Convert to normalized device coordinates
             this.mouse.x = (x / window.innerWidth) * 2 - 1;
             this.mouse.y = -(y / window.innerHeight) * 2 + 1;
     
@@ -188,10 +185,26 @@ export class DitheredRoom {
             const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
     
             if (intersects.length > 0) {
-                const object = intersects[0].object;
-                if (object.userData.callback) {
-                    object.userData.callback();
+                // Hide the clicked sphere and its text
+                const clickedObject = intersects[0].object;
+                clickedObject.visible = false;
+                if (clickedObject.userData.billboardText) {
+                    clickedObject.userData.billboardText.visible = false;
                 }
+                
+                // Execute the callback
+                if (clickedObject.userData.callback) {
+                    clickedObject.userData.callback();
+                }
+            } else {
+                // If clicking anywhere else, show all spheres
+                this.interactiveObjects.forEach(obj => {
+                    console.log(obj)
+                    obj.visible = true;
+                    if (obj.userData.billboardText) {
+                        obj.userData.billboardText.visible = true;
+                    }
+                });
             }
         };
     
@@ -199,18 +212,18 @@ export class DitheredRoom {
         this.container.addEventListener('click', handleInteraction);
         this.container.addEventListener('touchstart', handleInteraction, { passive: false });
     
-         // Update the mousemove event handler
+        // Keep the existing mousemove handler for hover effects
         this.container.addEventListener('mousemove', (event) => {
             this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+    
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
-
+    
             this.interactiveObjects.forEach(obj => {
                 obj.userData.isHovered = false;
             });
-
+    
             if (intersects.length > 0) {
                 const object = intersects[0].object;
                 if (object.userData.callback) {
@@ -522,13 +535,13 @@ export class DitheredRoom {
         );
     
         // Add a point light to create actual light emission
-        const pointLight = new THREE.PointLight(
-            getGlowColor(type),
-            0.5, // Intensity
-            1    // Distance
-        );
-        pointLight.position.copy(position);
-        this.scene.add(pointLight);
+        // const pointLight = new THREE.PointLight(
+        //     getGlowColor(type),
+        //     0.5, // Intensity
+        //     1    // Distance
+        // );
+        // pointLight.position.copy(position);
+        // this.scene.add(pointLight);
     
         // Create a bigger, transparent sphere for the glow effect
         const glowGeometry = new THREE.SphereGeometry(0.3, 32, 32);
@@ -725,7 +738,7 @@ export class DitheredRoom {
                 const textMaterial = obj.userData.billboardText.sprite.material;
                 textMaterial.opacity = obj.userData.isHovered ? 1 : 0.9;
                 // make text move further out from sphere when hovered
-                obj.userData.billboardText.offsetDistance = obj.userData.isHovered ? 0.8 : 0.3;
+                obj.userData.billboardText.offsetDistance =  0.3;
                 
             }
         });
@@ -821,7 +834,9 @@ export class DitheredRoom {
                     }
                 `,
                 transparent: true,
-                side: THREE.DoubleSide
+                side: THREE.DoubleSide,
+                emissive: new THREE.Color(0x000000),
+                emissiveIntensity: 0
             });
     
             // Start the animation
