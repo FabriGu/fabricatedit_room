@@ -703,8 +703,9 @@ export class DitheredRoom {
                         // create a progress bar and place it inside loaderScreen
                         // const progressBar = document.createElement('div');
                         const progressBar = document.getElementById('progressBar');
-                        if (progressBar) {
-                            progressBar.style.width = Math.round(progress.loaded / progress.total * 100) + '%';
+                        const progressFill = document.querySelector('#progressBar #progressFill');
+                        if (progressFill) {
+                            progressFill.style.width = Math.round(progress.loaded / progress.total * 100) + '%';
                         }
 
                     }

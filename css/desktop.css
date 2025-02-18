@@ -53,39 +53,101 @@
   }
 
   /* ------------------------------------------------------------LOADING  */
+  #loadingScreenWrapper {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
   #loadingScreen {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    align-self: center !important;
 
-    width: 40vw;
+    width: 70vw !important;
   }
 
   #loadingText {
-
     color: white;
   }
+  /*
   #progressBar {
-    /* width: 100%; */
+    width: 100%;
     margin-top: 20px;;
     height: 20px;
-    background-color: #f3f3f3;
+    background: rgba(0, 0, 0, 0.85);
+
+    border: 2px solid #fff;
+    
+    align-self: start;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+  */
+  #progressBar {
+    width: 100%;
+    margin-top: 20px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.85);
     border: 2px solid #fff;
     align-self: start;
-    /* border-radius: 5px; */
-    /* overflow: hidden; */
-    /* position: relative; */
+    position: relative;
+    overflow: hidden; /* Important for containing the gradient */
+    padding: 2px;
+  }
+
+  #progressFill {
+      height: 100%;
+      width: 0%; /* Will be updated via JavaScript */
+      background: linear-gradient(90deg, 
+          #8a00c2 0%,
+          #712290 50%,
+          #8a00c2 100%
+      );
+      background-size: 200% 100%;
+      animation: gradientMove 2s linear infinite;
+      transition: width 0.3s ease;
+  }
+
+  #scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.1) 0px,
+          rgba(255, 255, 255, 0.1) 1px,
+          transparent 1px,
+          transparent 2px
+      );
+  }
+
+  @keyframes gradientMove {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
   }
 
 
-  
   /* ----------------------------------------------------------- GENERAL */
-  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
   body {
     height: 100vh;
     overflow: hidden; /* Prevents body scrolling */
+    background: #000;
   }
+
   
   html,
   body {
@@ -95,135 +157,6 @@
   
   canvas {
     display: block;
-  }
-    
-  /* --------------------------------------------------------- BOOTSTRAP */
-  .container-fluid {
-    /* border: 1px solid #111; */
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-  
-    position:absolute;
-    top:0;
-    left:0;
-  
-  }
-  
-  .row {
-    /* border: 1px solid #000; */
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  .col {
-    /* border: 1px solid #000; */
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  /* ----------------------------------------------------------- INTRO */
-  #intro {
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-      flex-direction: column;
-  
-      /* background: color(255,255,255,0.5); */
-  }
-  
-  #intro h1 {
-      font-size: 10em;
-      text-align: center;
-      line-height: 50px;
-  }
-  
-  #intro p {
-      font-size: 3em;
-      text-align: center;
-      line-height: normal;
-  
-      margin-left: 30%;
-      margin-right: 30%;
-      max-width: 40%;
-  
-      line-height: 50px;
-  }
-  
-  #intro h1, #intro p {
-      z-index: 2;
-      position: relative;
-   
-      color: rgba(250,250,255,1);
-  }
-  
-  /* ------------------------------ */
-  
-  #intro {
-    text-align: center;
-    position: relative;
-  }
-  
-  #intro h1 {
-    /* font-size: 5rem; */
-    /* margin: 0;
-    padding: 0; */
-    /* transition: transform 1s ease; */
-    /* transform: translateY(0); */
-    /* opacity: 0; */
-    /* animation: titleAppear 1s ease forwards; */
-  
-  }
-  
-  #intro p {
-    /* font-size: 1.5rem; */
-    /* margin-top: 1rem; */
-    margin-top: 20px;
-  
-    opacity: 0;
-    transform: translateY(-20px);
-    animation: textAppear 5s ease forwards 2s;
-  }
-  
-  #intro.active h1 {
-    transform: translateY(-40px);
-  }
-  
-  #intro.active p {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  @keyframes titleAppear {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-  }
-  
-  @keyframes titleSlideUp {
-    0% {
-        transform: translateY(0);
-    }
-    100% {
-        transform: translateY(-40px);
-    }
-  }
-  
-  @keyframes textAppear {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
   }
   
   /* ----------------------------------------------------------------------- P5 */
@@ -235,212 +168,30 @@
     height: 100vh;
     z-index: 0;
   }
+
+  /* ----------------------------------------------------------------- 3D Room */
   
-  /* --------------------------------------------------------- INNER SCROLL */
-  /* This contains all your scrollable content */
-  .scroll-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    overflow-y: auto; /* Enables scrolling */
-    z-index: 1; /* Puts content above background */
-  }
-  
-  /* Style for the content container */
-  .content-wrapper {
-    position: relative;
-    min-height: 100vh; /* Ensures content is at least full height */
-    background: transparent; /* Allows background to show through */
-  }
-  
-  
-  /* --------------------------------------------------- OPAQUE SCREEN BACKGROUND */
-  
-  #opaqueScreen {
+  #roomContainer {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    pointer-events: none;
-    transition: opacity 0.3s ease-out;
-    opacity: 0;
-    z-index: 1;
-  }
-  
-  /* ----------------------------------------------------------- CONTENT */
-  
-  #work, #about, #contact {
-    /* border: 2px solid #0000ff; */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    position:relative;
-    z-index: 2;
-  }
-  
-  #work h3, #about h3, #contact h3 {
-    font-size: 7em;
-    text-align: center;
-  
-    padding:20px 0;
-  }
-  
-  #work .col-sm-12 .row {
-    /* border: 2px solid #ff0000; */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-  
-  
-  /* ----------------------------------------------------------- WORK CARDS */
-
-  
-  
-  .title {
-    font-size: 6em;
-    text-align: center;
-
-    padding:5px 0;
-    color:#f3f3f3;
-  }
-  
-  #gallery-container-works, #gallery-container-music {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    width: 100vw;
     height: 100vh;
-    overflow-y: auto; /* Enables scrolling */
-    z-index: 1; /* Puts content above background */
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* justify-content: center; */
-  }
-  
-  #cards, #gallery-overlay-works, #gallery-overlay-music {
-    width: 80%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap:wrap;
-    align-items: center !important;
-    justify-content: flex-start !important;
-  
-    height: auto;
-  
-  position:relative;
-  z-index: 2;
   }
 
+  /* ----------------------------------------------------------------- InfoPopUp */
+
+  .infoPopup {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 300px;
+    display: none;
+    z-index: 100;
+}
   
-  .work-card{
-    flex-grow: 1;
-  
-    margin: 2rem 0;
-    /* padding: 2rem; */
-    margin-left:5vw !important;
-    margin-right:5vw !important;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .work-card:hover {
-    transform: translateY(-4px);
-  }
-  
-  .work-card-image {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .work-card-image > * {
-    object-fit: contain;
-  }
-  
-  .work-card img {
-      width: 100%;
-      height: auto;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-  }
-  
-  .work-card video {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-    /* margin-bottom: 1rem; */
-  }
-  
-  .work-card-content h4 {
-      margin: 0 0 1rem 0;
-  }
-  
-  .work-card-content p {
-      margin: 0 0 1rem 0;
-      line-height: 1.5;
-  }
-  
-  .work-card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-  }
-  
-  .tag {
-      padding: 0.25rem 0.75rem;
-      background: #f0f0f0;
-      border-radius: 999px;
-      color: #333;
-  }
-  
-  .vids {
-    object-fit: cover;
-    
-    margin-bottom: -6px;
-    width: 100%;
-  }
-  
-  .text-container {
-    /* opaque background and rounded edges */
-    /* background: rgba(250,250,255,0.9); */
-    /* border-radius: 3px; */
-    /* width: 100%; */
-    /* height:100%; */
-    box-sizing: border-box;
-  
-  }
-  /* 
-  .text-container.visible {
-    visibility: visible;
-    opacity: 1;
-  } */
-  
-  .text-container .fontQuaternary {
-    
-      font-size: 2.5em;
-      text-align: center;
-      margin-top: 1rem;
-  }
-  
-  .text-container .fontQuinary {
-    
-      font-size: 1.5em;
-      text-align: center;
-      margin-top: 1rem;
-  }
-  
-  .text {
-    padding-bottom: 1rem;
-  }
   
   /* ---------------------------------------------- ABOUT + CONTACT*/
   #about > *, #contact >* {
@@ -486,41 +237,7 @@
     height: auto;
   }
   
-  .text-container {
-    /* textContainer.style.display = 'flex';
-    textContainer.style.flexDirection = 'column';
-    textContainer.style.alignItems = 'center';
-    textContainer.style.justifyContent = 'center';
-    textContainer.style.width = '100%';
-    textContainer.style.height = '100%';
-    textContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  /* 
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease; */
   
-    /* width: 80%; */
-    /* height: 100%; */
-    /* height: 100%; */
-    /* background-color: rgba(0, 0, 0, 0.5); */
-  
-    position: absolute;
-    z-index: 5;
-  
-    padding-left: 5rem;
-    padding-right:5rem;
-  }
   
   .text {
     text-align: center;
@@ -565,16 +282,219 @@
     
       margin:5px !important;
   }
+  /* ----------------------------------------------------------- WORK CARDS */
+  .title {
+    font-size: 8vw;
+    text-align: center;
+
+    padding:1vh 0;
+    /* margin-bottom: -10px !important; */
+    color:#f3f3f3;
+  }
   
+  #gallery-container-works, #gallery-container-music {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto; /* Enables scrolling */
+    z-index: 1; /* Puts content above background */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+  }
+  
+  #cards, #gallery-overlay-works, #gallery-overlay-music {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap:wrap;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  
+    height: auto;
+  
+  position:relative;
+  z-index: 2;
+  }
+
+  
+  .work-card{
+    flex-grow: 1;
+  
+    margin: 2vw 0;
+    /* padding: 2rem; */
+    margin-left:5vw !important;
+    margin-right:5vw !important;
+    transition: transform 0.2s ease-in-out;
+    
+    /* Add a subtle pixelated border */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    
+    /* Sharper transitions to match the dithered look */
+    transition: transform 0.15s steps(5);
+  }
+  
+  .work-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .work-card-image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Make sure work-card-image maintains relative positioning for absolute text container */
+  .work-card-image,
+  .carousel-item {
+      position: relative;
+      width: 100%;
+      height: 100%;
+  }
+  
+  .work-card-image > * {
+    object-fit: contain;
+  }
+  
+  .work-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+  }
+  
+  .work-card video {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    /* margin-bottom: 1rem; */
+  }
+  
+  .work-card-content h4 {
+      margin: 0 0 1rem 0;
+  }
+  
+  .work-card-content p {
+      margin: 0 0 1rem 0;
+      /* line-height: 0.1; */
+  }
+  
+  /* .work-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+  } */
+  
+  /* .tag {
+      padding: 0.25rem 0.75rem;
+      background: #f0f0f0;
+      border-radius: 999px;
+      color: #333;
+  } */
+  
+  .vids {
+    object-fit: cover;
+    
+    margin-bottom: -6px;
+    width: 100%;
+  }
+  
+  .text-container {
+    line-height: 1vh;
+    box-sizing: border-box;
+
+    position: absolute;
+
+    top: 50%;
+    
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100% !important;
+    /* height: 100% !important; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    padding: 0; /* Remove the padding that was causing size issues */
+    background: rgba(0, 0, 0, 0.85);
+    transition: all 0.15s steps(5);
+  }
+
+
+  /* Add scanlines to text container background */
+  .text-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: -1; /* Place behind the text */
+  }
+
+
+
+/* Adjust text alignment and spacing within container */
+.text-container .title,
+.text-container .text {
+  position: relative;
+  z-index: 1;
+  /* padding: 1rem; */
+  /* padding-bottom: 1rem; */
+  padding: 1vh;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  
+  width: 100%;
+  text-align: center;
+  
+}
+
+  
+  .text-container .fontQuaternary {
+      line-height: 1;
+      font-size: 4.94vw;
+      text-align: center;
+      margin-top: 1rem;
+      padding-bottom: 1rem;
+  }
+  
+  .text-container .fontQuinary {
+      line-height: 1;
+      font-size: 3.06vw;
+      text-align: center;
+      margin-bottom: 1rem;
+  }
+
   /* ------------------------------------ CAROUSEL ----- */
   .work-card.row-type {
     width: 100%;
     aspect-ratio: 16/9;
-    margin: 2rem 0;
+    margin: 2vw 0;
     /* padding: 2rem; */
     margin-left: 5vw !important;
     margin-right: 5vw !important;
     border: 0px;
+
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .carousel-wrapper {
@@ -588,7 +508,7 @@
   .carousel-track {
     position: absolute;
     display: flex;
-    gap: 2rem;
+    gap: 2vw;
     height: 100%;
     width:100%;
     transition: transform 0.1s ease-out;
@@ -596,8 +516,8 @@
   }
   
   .carousel-item {
-    flex: 0 0 calc(33.333% - 2rem);
-    min-width: calc(33.333% - 2rem);
+    flex: 0 0 calc(33.333% - 2vw);
+    min-width: calc(33.333% - 2vw);
     height: 100%;
     width:100% !important;
     border-radius: 4px;
@@ -638,7 +558,7 @@
       aspect-ratio: 1/1 !important;  /* This makes it square */
       height: 100% !important;
       width: auto !important;  /* Let height determine width for square */
-      margin-right: 2rem !important;
+      margin-right: 1vw !important;
       border-radius: 4px;
       overflow: hidden;
   }
@@ -670,34 +590,12 @@
     aspect-ratio: 1/1 !important;  /* This makes it square */
     height: 100% !important;
     width: auto !important;  /* Let height determine width for square */
-    margin-right: 2rem !important;
+    /* margin-right: 2rem !important; */
     border-radius: 4px;
     /* overflow: hidden; */
   
   }
-  
-  .work-card.row-type {
-    width: 100%;
-    aspect-ratio: 16/9;
-    margin: 2rem 0;
-    /* padding: 2rem; */
-    margin-left: 5vw !important;
-    margin-right: 5vw !important;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  
-  /* 
-  .work-card.row-type .carousel-track {
-    position: absolute;
-    display: flex;
-    height: 60%;
-    transition: transform 0.1s ease-out;
-    z-index: 1;
-  } */
+
   .work-card.row-type .carousel-item {
     position: relative;
     display: block !important;
@@ -706,7 +604,7 @@
     height: 100% !important;
     aspect-ratio: 1/1 !important;
     flex: 0 0 auto !important; /* Prevent flex from squishing */
-    margin-right: 2rem !important;
+    /* margin-right: 2rem !important; */
     border-radius: 4px;
     overflow: hidden;
   }
@@ -740,7 +638,7 @@
   .work-card.row-type .carousel-track {
     display: flex;
     height: 100%;
-    gap: 2rem;
+    gap: 2vw;
   }
   
   .work-card.row-type .carousel-item {
@@ -751,6 +649,7 @@
   }
   
 
+   /* ----------------------------------------------------------- GALLERY */
 
   /* --- change style */
   /* Modify the gallery container to have a more grainy/dithered look */
@@ -773,45 +672,7 @@
     filter: contrast(100%) brightness(100%);
 }
 
-/* Style the work cards to be more "retro" */
-.work-card {
-    /* Keep your flex and margin settings */
-    flex-grow: 1;
-    margin: 2rem 0;
-    /* padding: 2rem; */
-    margin-left: 5vw !important;
-    margin-right: 5vw !important;
-    
-    /* Add a subtle pixelated border */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.3);
-    
-    /* Sharper transitions to match the dithered look */
-    transition: transform 0.15s steps(5);
-}
 
-/* Make text more crisp/pixelated to match the dithered aesthetic */
-.text-container .fontQuaternary,
-.text-container .fontQuinary {
-    /* text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8); */
-    /* Increase contrast for better readability */
-    /* color: rgba(255, 255, 255, 0.95); */
-}
-
-/* Add pixelated transitions */
-.text-container {
-    transition: all 0.15s steps(5);
-    background: rgba(0, 0, 0, 0.85);
-    /* border: 1px solid rgba(255, 255, 255, 0.15); */
-}
-
-/* Keep videos and images crisp */
-.work-card img,
-.work-card video,
-.vids {
-    /* border: 1px solid rgba(255, 255, 255, 0.15); */
-    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
-}
 
 /* Add a subtle scan line effect */
 #gallery-container-works::after, #gallery-container-music::after {
@@ -858,8 +719,6 @@
   
   flex-wrap: wrap;
   max-width:70%;
-
-
 }
 
 #gallery-overlay-music > * {
@@ -874,214 +733,9 @@
     border-radius: 0px !important;
 }
 
-#spotify > * {
-  border-radius: 0px !important;
-}
-
 #gallery-overlay-music > .work-card {
     /* a little smaller than before */
     max-width: 35% !important;
     /* margin:0px !important; */
     /* flex-grow: 1; */
 }
-
-/* Add scanlines to text containers and make them fill the media container */
-.text-container {
-    position: absolute;
-
-    top: 50%;
-    
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100% !important;
-    /* height: 100% !important; */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    padding: 0; /* Remove the padding that was causing size issues */
-    background: rgba(0, 0, 0, 0.85);
-    transition: all 0.15s steps(5);
-}
-
-/* Add scanlines to text container background */
-.text-container::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.1),
-        rgba(0, 0, 0, 0.1) 1px,
-        transparent 1px,
-        transparent 2px
-    );
-    pointer-events: none;
-    z-index: -1; /* Place behind the text */
-}
-
-/* Make sure work-card-image maintains relative positioning for absolute text container */
-.work-card-image,
-.carousel-item {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-/* Adjust text alignment and spacing within container */
-.text-container .title,
-.text-container .text {
-    position: relative;
-    z-index: 1;
-    padding: 1rem;
-    width: 100%;
-    text-align: center;
-}
-
-/* from index.html */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    overflow: hidden;
-    background: #000;
-}
-
-#roomContainer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-}
-
-#loadingScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: #000;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: monospace;
-    font-size: 1.5em;
-    z-index: 1000;
-}
-
-.infoPopup {
-    position: fixed;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 300px;
-    display: none;
-    z-index: 100;
-}
-
-/*  spotify */
-/* Add these styles to your CSS */
-
-/* Spotify iframe wrapper */
-.spotify-wrapper {
-  flex-grow: 1;
-  margin: 2rem 0;
-  /* border: 1px solid rgba(255, 255, 255, 0.2); */
-  /* background: rgba(0, 0, 0, 0.3); */
-  transition: transform 0.15s steps(5);
-  width: 70% !important;
-  /* max-width: 35%; */
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-}
-.spotify-wrapper:hover {
-  transform: translateY(-4px);
-}
-
-/* Remove all border-radius and adjust iframe sizing */
-.spotify-wrapper iframe {
-  /* border: 1px solid rgba(255, 255, 255, 0.15) !important; */
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important; */
-  box-sizing: border-box;
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 0 !important;
-  /* background: transparent; */
-  /* filter: grayscale(0.3) contrast(1.1); */
-
-  aspect-ratio: 16/9;
-}
-
-/* Force remove border-radius from all Spotify elements */
-.spotify-wrapper iframe *,
-.spotify-wrapper iframe > *,
-.spotify-wrapper *, 
-.spotify-wrapper > *,
-.spotify-wrapper > *{
-  border-radius: 0px !important;
-}
-
-#gallery-overlay-music {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around !important;
-  flex-wrap: wrap;
-  max-width: 70%;
-  gap: 2rem;
-}
-
-.spotify-wrapper::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  /* background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.1),
-      rgba(0, 0, 0, 0.1) 1px,
-      transparent 1px,
-      transparent 2px
-  ); */
-  pointer-events: none;
-  z-index: 1;
-  mix-blend-mode: overlay;
-}
-
-.spotify-wrapper ::-webkit-scrollbar {
-  width: 8px;
-  /* background: rgba(0, 0, 0, 0.3); */
-}
-
-.spotify-wrapper ::-webkit-scrollbar-thumb {
-  /* background: rgba(255, 255, 255, 0.2); */
-  /* border: 1px solid rgba(255, 255, 255, 0.15); */
-  border-radius: 0;
-}
-
-/* Ensure proper spacing */
-.spotify-wrapper + .spotify-wrapper {
-  margin-left: 2rem;
-}
-
-.TrackWidget_widgetContainer__gADzr {
-  border-radius: 0px !important;
-}
-
-#_next > div > div {
-  border-radius: 0px !important;
-}
-

@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://use.typekit.net/juk6bpt.css">
-    <title>Interactive 3D Room</title>
+    <title>Fabri's Room</title>
+
     <!-- link css -->
     <link rel="stylesheet" href="/css/desktop.css">
+    <link rel="stylesheet" href="https://use.typekit.net/juk6bpt.css">
     
+    <!-- IMPORT 3Js -->
     <script type="importmap">
     {
         "imports": {
@@ -16,30 +18,47 @@
         }
     }
     </script>
-    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 
-
-    
+    <!-- Spotify API -->
+    <!-- <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>     -->
 </head>
 <body>
+    <!-- LOADING SCREEN -->
     <script>
         const loadingSentences = ["Folding laundry", "Tidying desk","Watering plants", "Cleaning Windows","Arranging trinkets",  "Dusting Shelves"];
     </script>
     
+    <!-- 3JS modules -->
     <script type="module" src="galleryOverlay.js"></script>
     <script type="module" src="enhancedControls.js"></script>
-    <div id="loadingScreen" >
-        <div id="loadingText" class="fontPrimary"></div>
-        <div id="progressBar"></div>
+
+    <div id="loadingScreenWrapper">
+        <div id="loadingScreen" >
+            <div id="loadingText" class="fontPrimary"></div>
+            
+            <div id="progressBar">
+                <div id="progressFill"></div>
+                <div id="scanlines"></div>
+            </div>
+
+        </div>
     </div>
+    
+
     <div id="roomContainer"></div>
     
     <div id="gallery-container-works">
         <div id="gallery-overlay-works">
-
         </div>
     </div>
-    <div id="gallery-container-music">
+
+    <div id ="gallery-container-fasho">
+        <div id="gallery-overlay-fasho">
+        </div>
+    </div>
+
+    <!-- MUSIC -->
+    <!-- <div id="gallery-container-music">
         <div id="gallery-overlay-music">
             <div class="work-card"id="embed-iframe"></div>
             <div class="spotify-wrapper">
@@ -55,15 +74,8 @@
 
             </div>
         </div>
-    </div>
-    <div id ="gallery-container-fasho">
-        <div id="gallery-overlay-fasho">
-
-        </div>
-    </div>
-    <div id="infoPopup" class="infoPopup"></div>
-
-    <script>
+    </div> -->
+    <!-- <script>
         window.onSpotifyIframeApiReady = (IFrameAPI) => {
         const element = document.getElementById('embed-iframe');
         const options = {
@@ -72,25 +84,24 @@
         const callback = (EmbedController) => {};
         IFrameAPI.createController(element, options, callback);
         };
-    </script>
+    </script> -->
+
+    <!-- <div id="infoPopup" class="infoPopup"></div> -->
+
+    
 
     <script type="module">
-        
         import { DitheredRoom } from './ditheredRoom.js';
         import { GalleryOverlay } from './galleryOverlay.js';
-        
-        // import { GalleryOverlay} from './galleryOverlay.js';
         import * as THREE from 'three';
+
         window.globalRoom = null;
         
         window.addEventListener('load', async () => {
             try {
-                
                 const room = new DitheredRoom('roomContainer');
                 window.globalRoom = room;  // Store reference globally
-                // Set room reference for each gallery
                
-
                 // Define viewpoints
                 // [x,  y, z], [lookX, lookY, lookZ]
                 // BLUE == Z
@@ -117,79 +128,63 @@
                     maxDistance: 0.5
                 });
 
-                room.addViewpoint('Albums',[0.15, 0, 1],[0.15, 0, 2], {
-                    minPolarAngle: Math.PI / 4,
-                    maxPolarAngle: Math.PI * 0.6,
-                    minDistance: 2,
-                    maxDistance: 5
-                });
+                // room.addViewpoint('Albums',[0.15, 0, 1],[0.15, 0, 2], {
+                //     minPolarAngle: Math.PI / 4,
+                //     maxPolarAngle: Math.PI * 0.6,
+                //     minDistance: 2,
+                //     maxDistance: 5
+                // });
+
+                await new Promise(resolve => setTimeout(resolve, 100)); // await to make sure global room variable is ready and set
+
+                // Initialize gallery overlay for work stuff
+                const galleryWork = new GalleryOverlay('gallery-container-works');
+                galleryWork.setRoom(room);
+                galleryWork.setCloseCallback(() => room.goToViewpoint('Entrance'));
+
+                room.addInteractiveItem(
+                    new THREE.Vector3(0.4, -0.4, -1.47),
+                    async () => {
+                        await room.goToViewpoint('Desk');
+                        galleryWork.show();
+                    },
+                    'viewpoint',
+                    'WORK'
+                );
+
+                const galleryFashion = new GalleryOverlay('gallery-container-fasho');
+                galleryFashion.setRoom(room);
+                galleryFashion.setCloseCallback(() => room.goToViewpoint('Entrance'));
+
+                room.addInteractiveItem(
+                    new THREE.Vector3(-0.7, 0, 0.3),
+                    async () => {
+                        await room.goToViewpoint('Wardrobe');
+                        galleryFashion.show();
+                    },
+                    'viewpoint',
+                    'FASHION',
                 
-                // // Add interactive items for navigation
+                );
+
+
+                // initialize gallery overlay for music 
+                // const galleryMusic = new GalleryOverlay('gallery-container-music');
+                
+                // galleryMusic.setRoom(room);
+
+                // galleryMusic.setCloseCallback(() => room.goToViewpoint('Entrance'));
+
+                // // await gallery.loadWorks();  // Load the works data
                 // room.addInteractiveItem(
-                //     new THREE.Vector3(-2, 0, 0),
-                //     () => room.goToViewpoint('Bed'),
-                //     'viewpoint'
+                //     new THREE.Vector3(0.15, 0, 1),
+                //     async () => {
+                //         await room.goToViewpoint('Albums');
+                //         galleryMusic.show();
+                //     },
+                //     'viewpoint',
+                //     'MUSIC'
                 // );
-                
-                // room.addInteractiveItem(
-                //     new THREE.Vector3(-1.1, -0.5, -1),
-                //     () => room.goToViewpoint('Desk'),
-                //     'viewpoint'
-                // );
-
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Initialize gallery overlay for work stuff
-        const galleryWork = new GalleryOverlay('gallery-container-works');
-        galleryWork.setRoom(room);
-                
-
-        galleryWork.setCloseCallback(() => room.goToViewpoint('Entrance'));
-
-
-        // await gallery.loadWorks();  // Load the works data
-        room.addInteractiveItem(
-            new THREE.Vector3(0.4, -0.4, -1.47),
-            async () => {
-                await room.goToViewpoint('Desk');
-                galleryWork.show();
-            },
-            'viewpoint',
-            'WORK'
-        );
-
-        // initialize gallery overlay for music 
-        const galleryMusic = new GalleryOverlay('gallery-container-music');
-        
-        galleryMusic.setRoom(room);
-
-        galleryMusic.setCloseCallback(() => room.goToViewpoint('Entrance'));
-
-        // await gallery.loadWorks();  // Load the works data
-        room.addInteractiveItem(
-            new THREE.Vector3(0.15, 0, 1),
-            async () => {
-                await room.goToViewpoint('Albums');
-                galleryMusic.show();
-            },
-            'viewpoint',
-            'MUSIC'
-        );
-
-        const galleryFashion = new GalleryOverlay('gallery-container-fasho');
-        galleryFashion.setRoom(room);
-        galleryFashion.setCloseCallback(() => room.goToViewpoint('Entrance'));
-
-        room.addInteractiveItem(
-            new THREE.Vector3(-0.7, 0, 0.3),
-            async () => {
-                await room.goToViewpoint('Wardrobe');
-                galleryFashion.show();
-            },
-            'viewpoint',
-            'FASHION',
-        
-        );
 
                 
                 // // Add info points
@@ -199,11 +194,6 @@
                 //     'info'
                 // );
 
-                // room.addInteractiveItem(
-                //     new THREE.Vector3(1, 0, 0),
-                //     () => room.goToViewpoint('Lamp'),
-                //     'viewpoint'
-                // );
                 
                 // Load the model
                 await room.loadModel('./scans/Room_1.glb');
