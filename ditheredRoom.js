@@ -19,14 +19,10 @@ export class DitheredRoom {
         this.setupLighting();
         this.setupPostProcessing();
 
-
         // Add gallery overlay setup
         // this.setupOverlay();
 
-
         this.setupInteractionSystem();
-
-
     }
 
     setup() {
@@ -588,6 +584,7 @@ export class DitheredRoom {
             const maxWidth = 1.8; // Maximum width for any text
             
             const billboardText = new BillboardText(labelText, finalTextSize, maxWidth);
+            billboardText.fontFamily("'scandia-line-web'")
             billboardText.setSphereCenter(position);
             this.scene.add(billboardText);
             item.userData.billboardText = billboardText;
@@ -868,6 +865,7 @@ class BillboardText extends THREE.Object3D {
         // Configure text style
         context.fillStyle = 'white';
         context.font = "bold 64px 'scandia-line-web'";
+        context.fontName="'scandia-line-web'";
         context.textAlign = 'center';
         context.textBaseline = 'middle';
         
@@ -938,6 +936,12 @@ class BillboardText extends THREE.Object3D {
 
     setSphereCenter(center) {
         this.sphereCenter.copy(center);
+    }
+
+    fontFamily(fontName) {
+        // This method doesn't need to do anything since the font is already set in the constructor
+        // It just exists so the method call doesn't throw an error
+        return this; // For method chaining
     }
 }
 
