@@ -836,8 +836,8 @@ export class DitheredRoom {
                 `,
                 transparent: true,
                 side: THREE.DoubleSide,
-                emissive: new THREE.Color(0x000000),
-                emissiveIntensity: 0
+                // emissive: new THREE.Color(0x000000),
+                // emissiveIntensity: 0
             });
     
             // Start the animation
