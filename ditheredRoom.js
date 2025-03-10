@@ -36,6 +36,13 @@ export class DitheredRoom {
             0.1,
             1000
         );
+
+        // Set initial camera position here
+        this.camera.position.set(0, 2.5, -3); // x, y, z coordinates
+        // rotate camera 180 degrees on horizon
+        this.camera.rotateY(3.14159);
+        this.camera.rotateX(-0.698132)
+    
         
         this.renderer = new THREE.WebGLRenderer({ 
             antialias: false, // Disable antialiasing for better dithering effect
