@@ -170,8 +170,8 @@ export class EnhancedControls {
 
     rotateCamera(deltaX, deltaY) {
         // Update rotation angles
-        this.rotationX -= deltaX;
-        this.rotationY -= deltaY;
+        this.rotationX += deltaX;
+        this.rotationY += deltaY;
 
         // Clamp vertical rotation to prevent over-rotation
         this.rotationY = Math.max(this.minPolarAngle, Math.min(this.maxPolarAngle, this.rotationY));
@@ -237,7 +237,7 @@ export class EnhancedControls {
         forward.applyQuaternion(this.camera.quaternion);
         
         // Apply zoom speed and direction
-        forward.multiplyScalar(delta * this.zoomSpeed);
+        forward.multiplyScalar(-delta * this.zoomSpeed);
         
         // Update camera position without bounds checking for zoom
         this.camera.position.add(forward);

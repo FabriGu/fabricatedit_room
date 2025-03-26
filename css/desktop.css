@@ -194,16 +194,26 @@
   
   
   /* ---------------------------------------------- ABOUT + CONTACT*/
+  #gallery-container-about {
+    display: none;
+
+  }
+  #gallery-overlay-about {
+    flex-direction: column !important;
+    justify-content: center !important;
+    color: white;
+  }
+
   #about > *, #contact >* {
     /* border: 2px solid #0000ff; */
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center !important;
+    align-items: center !important;
     flex-direction: column;
     position:relative;
     z-index: 2;
     
-    width: 80%;
+    /* width: 80%; */
   
     text-align: justify;
   }
@@ -213,9 +223,10 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
-    width: 40%;
+    justify-content: center;
+    width: 100%;
   
   }
   
@@ -223,9 +234,9 @@
     padding: 20px;
   
     width: 80%;
-  
-    font-size: 20pt;
-    font-weight: 900;
+    
+    /* font-size: 20pt; */
+    /* font-weight: 900; */
   }
   
   #aboutImg {
@@ -233,8 +244,12 @@
     justify-content: center;
     align-items: center;
   
-    width: 40%;
+    width: 100%;
     height: auto;
+  }
+
+  #aboutImg img {
+    width:50%
   }
   
   
@@ -303,7 +318,7 @@
     color:#f3f3f3;
   }
   
-  #gallery-container-works, #gallery-container-music {
+  div[id^="gallery-container-"] {
     position: absolute;
     top: 0;
     left: 0;
@@ -318,7 +333,7 @@
     /* justify-content: center; */
   }
   
-  #cards, #gallery-overlay-works, #gallery-overlay-music {
+  #cards, #gallery-overlay-works, #gallery-overlay-music, div[id^="gallery-overlay-"] {
     width: 80%;
     display: flex;
     flex-direction: row;
@@ -664,7 +679,7 @@
 
   /* --- change style */
   /* Modify the gallery container to have a more grainy/dithered look */
-#gallery-container-works , #gallery-container-music {
+#gallery-container-works , #gallery-container-music, div[id^="gallery-container-"] {
     /* Keep your existing positioning */
     position: absolute;
     top: 0;
@@ -750,3 +765,5 @@
     /* margin:0px !important; */
     /* flex-grow: 1; */
 }
+
+/* --------------------------------------------------------------- ABOUT  */

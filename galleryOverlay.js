@@ -85,9 +85,13 @@ export class GalleryOverlay {
 
     async show() {
         // First load the works if they haven't been loaded
-        if (!this.worksLoader) {
-            await this.workLoader.loadWorks();
+        console.log(this.containerType)
+        if (this.containerType != "-about") {
+            if (!this.worksLoader) {
+                await this.workLoader.loadWorks();
+            }
         }
+       
         // Show the container
         this.container.style.display = 'flex';
         this.container.classList.add('visible');
