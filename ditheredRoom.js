@@ -231,84 +231,40 @@ export class DitheredRoom {
     // // Optional: Add axis helper to show X (red), Y (green), Z (blue) directions
     // const axisHelper = new THREE.AxesHelper(5);
     // this.scene.add(axisHelper);
+
+    // Add this in your setup() or constructor method
+const detectPixelRatioChange = () => {
+    const currentPixelRatio = window.devicePixelRatio;
+    const mediaQuery = window.matchMedia(`(resolution: ${currentPixelRatio}dppx)`);
+    
+    mediaQuery.addEventListener('change', () => {
+      // When pixel ratio changes (window moved to different screen)
+      if (this.ditherPass) {
+        this.ditherPass.uniforms.pixelRatio.value = window.devicePixelRatio;
+      }
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+    });
+  };
+  
+  detectPixelRatioChange();
   }
 
-//   setupPostProcessing() {
-//     this.composer = new EffectComposer(this.renderer);
-//     this.composer.addPass(new RenderPass(this.scene, this.camera));
-
-//     const ditherShader = {
-//       uniforms: {
-//         tDiffuse: { value: null },
-//         resolution: {
-//           value: new THREE.Vector2(window.innerWidth, window.innerHeight),
-//         },
-//         ditherPattern: { value: this.createDitherPattern() },
-//       },
-//       vertexShader: `
-//                 varying vec2 vUv;
-//                 void main() {
-//                     vUv = uv;
-//                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-//                 }
-//             `,
-//       fragmentShader: `
-//                 uniform sampler2D tDiffuse;
-//                 uniform vec2 resolution;
-//                 uniform sampler2D ditherPattern;
-//                 varying vec2 vUv;
-
-//                 void main() {
-//                     vec4 color = texture2D(tDiffuse, vUv);
-//                     vec2 ditherCoord = gl_FragCoord.xy / 8.0;
-//                     float threshold = texture2D(ditherPattern, mod(ditherCoord, 1.0)).r;
-                    
-//                     // Calculate luminance
-//                     float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-                    
-//                     // Skip dithering for very dark areas
-//                     if (luminance < 0.01) {
-//                         gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
-//                         return;
-//                     }
-                    
-//                     // Apply dithering to each color channel separately
-//                     float r = step(threshold, color.r);
-//                     float g = step(threshold, color.g);
-//                     float b = step(threshold, color.b);
-                    
-//                     // Mix between full color and dithered color
-//                     float ditherStrength = 0.9; // Adjust this value to control dither intensity
-//                     vec3 ditheredColor = mix(
-//                         color.rgb,
-//                         vec3(r, g, b),
-//                         ditherStrength
-//                     );
-                    
-//                     gl_FragColor = vec4(ditheredColor, color.a);
-//                 }
-//             `,
-//     };
-
-//     const ditherPass = new ShaderPass(ditherShader);
-//     this.composer.addPass(ditherPass);
-//   }
 
 
-// Replace your setupPostProcessing method with this:
-// Replace your setupPostProcessing method with this:
 setupPostProcessing() {
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
   
     const ditherShader = {
-      uniforms: {
-        tDiffuse: { value: null },
-        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-        ditherPattern: { value: this.createDitherPattern() },
-        patternSize: { value: 8.0 }, // The pattern is 8x8
-        ditherStrength: { value: 0.9 }
-      },
+        uniforms: {
+          tDiffuse: { value: null },
+          resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+          ditherPattern: { value: this.createDitherPattern() },
+          patternSize: { value: 8.0 },
+          pixelRatio: { value: window.devicePixelRatio }, // Add this line
+          ditherStrength: { value: 0.9 }
+        },
+        // Rest of shader code
       vertexShader: `
         varying vec2 vUv;
         void main() {
@@ -317,84 +273,66 @@ setupPostProcessing() {
         }
       `,
       fragmentShader: `
-        uniform sampler2D tDiffuse;
-        uniform vec2 resolution;
-        uniform sampler2D ditherPattern;
-        uniform float patternSize;
-        uniform float ditherStrength;
-        varying vec2 vUv;
-  
-        void main() {
-            vec4 color = texture2D(tDiffuse, vUv);
-            
-            // Calculate screen-space coordinates at a consistent scale
-            // The 1.0 value controls the overall size of the dither pattern
-            float patternScale = 1.0;
-            vec2 screenPos = gl_FragCoord.xy / patternScale;
-            
-            // Maintain consistent pattern size regardless of screen resolution
-            vec2 patternCoord = mod(screenPos, patternSize) / patternSize;
-            float threshold = texture2D(ditherPattern, patternCoord).r;
-            
-            // Calculate luminance
-            float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-            
-            // Skip dithering for very dark areas
-            if (luminance < 0.01) {
-                gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
-                return;
-            }
-            
-            // Apply dithering to each color channel separately
-            float r = step(threshold, color.r);
-            float g = step(threshold, color.g);
-            float b = step(threshold, color.b);
-            
-            // Mix between full color and dithered color
-            vec3 ditheredColor = mix(
-                color.rgb,
-                vec3(r, g, b),
-                ditherStrength
-            );
-            
-            gl_FragColor = vec4(ditheredColor, color.a);
-        }
-      `,
+  uniform sampler2D tDiffuse;
+  uniform vec2 resolution;
+  uniform sampler2D ditherPattern;
+  uniform float patternSize;
+  uniform float ditherStrength;
+  uniform float pixelRatio; // Use the device's pixel ratio
+  varying vec2 vUv;
+
+  void main() {
+      vec4 color = texture2D(tDiffuse, vUv);
+      
+      // Calculate screen-space coordinates with pixel ratio adjustment
+      float scaleFactor = 1.0 / pixelRatio;
+      vec2 screenPos = gl_FragCoord.xy * scaleFactor;
+      
+      // Apply consistent pattern size
+      vec2 patternCoord = mod(screenPos, patternSize) / patternSize;
+      float threshold = texture2D(ditherPattern, patternCoord).r;
+      
+      // Calculate luminance
+      float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+      
+      // Skip dithering for very dark areas
+      if (luminance < 0.01) {
+          gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
+          return;
+      }
+      
+      // Apply dithering to each color channel separately
+      float r = step(threshold, color.r);
+      float g = step(threshold, color.g);
+      float b = step(threshold, color.b);
+      
+      // Mix between full color and dithered color
+      vec3 ditheredColor = mix(
+          color.rgb,
+          vec3(r, g, b),
+          ditherStrength
+      );
+      
+      gl_FragColor = vec4(ditheredColor, color.a);
+  }
+`,
     };
   
     this.ditherPass = new ShaderPass(ditherShader);
     this.composer.addPass(this.ditherPass);
   }
 
-//   createDitherPattern() {
-//     const pattern = [
-//       0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4,
-//       36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33,
-//       9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63,
-//       31, 55, 23, 61, 29, 53, 21,
-//     ].map((x) => x / 64);
-
-//     const texture = new THREE.DataTexture(
-//       new Float32Array(pattern),
-//       8,
-//       8,
-//       THREE.RedFormat,
-//       THREE.FloatType
-//     );
-//     texture.needsUpdate = true;
-//     return texture;
-//   }
 createDitherPattern() {
     // Bayer 8x8 dithering matrix - provides a more uniform pattern
     const pattern = [
-      0, 32, 8, 40, 2, 34, 10, 42, 
-      48, 16, 56, 24, 50, 18, 58, 26, 
-      12, 44, 4, 36, 14, 46, 6, 38, 
-      60, 28, 52, 20, 62, 30, 54, 22, 
-      3, 35, 11, 43, 1, 33, 9, 41, 
-      51, 19, 59, 27, 49, 17, 57, 25, 
-      15, 47, 7, 39, 13, 45, 5, 37, 
-      63, 31, 55, 23, 61, 29, 53, 21
+        0, 48, 12, 60,  3, 51, 15, 63,
+       32, 16, 44, 28, 35, 19, 47, 31,
+        8, 56,  4, 52, 11, 59,  7, 55,
+       40, 24, 36, 20, 43, 27, 39, 23,
+        2, 50, 14, 62,  1, 49, 13, 61,
+       34, 18, 46, 30, 33, 17, 45, 29,
+       10, 58,  6, 54,  9, 57,  5, 53,
+       42, 26, 38, 22, 41, 25, 37, 21
     ].map((x) => x / 64);
   
     const texture = new THREE.DataTexture(
@@ -1052,11 +990,14 @@ createDitherPattern() {
   // Update shader uniforms
   
   // Update shader uniforms
+  
+  // Update the shader uniforms
   if (this.ditherPass) {
     this.ditherPass.uniforms.resolution.value.set(
       window.innerWidth,
       window.innerHeight
     );
+    this.ditherPass.uniforms.pixelRatio.value = window.devicePixelRatio;
   }
     
     // Update dither scale and pixel ratio
