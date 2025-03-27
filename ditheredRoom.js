@@ -233,6 +233,7 @@ export class DitheredRoom {
     // this.scene.add(axisHelper);
 
     // Add this in your setup() or constructor method
+// Add pixel ratio change detection
 const detectPixelRatioChange = () => {
     const currentPixelRatio = window.devicePixelRatio;
     const mediaQuery = window.matchMedia(`(resolution: ${currentPixelRatio}dppx)`);
@@ -245,26 +246,97 @@ const detectPixelRatioChange = () => {
       this.renderer.setPixelRatio(window.devicePixelRatio);
     });
   };
-  
+
   detectPixelRatioChange();
   }
 
 
 
+// setupPostProcessing() {
+//     this.composer = new EffectComposer(this.renderer);
+//     this.composer.addPass(new RenderPass(this.scene, this.camera));
+  
+//     const ditherShader = {
+//         uniforms: {
+//           tDiffuse: { value: null },
+//           resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+//           ditherPattern: { value: this.createDitherPattern() },
+//           patternSize: { value: 8.0 },
+//           pixelRatio: { value: window.devicePixelRatio }, // Add this line
+//           ditherStrength: { value: 0.9 }
+//         },
+//         // Rest of shader code
+//       vertexShader: `
+//         varying vec2 vUv;
+//         void main() {
+//             vUv = uv;
+//             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+//         }
+//       `,
+//       fragmentShader: `
+//   uniform sampler2D tDiffuse;
+//   uniform vec2 resolution;
+//   uniform sampler2D ditherPattern;
+//   uniform float patternSize;
+//   uniform float ditherStrength;
+//   uniform float pixelRatio; // Use the device's pixel ratio
+//   varying vec2 vUv;
+
+//   void main() {
+//       vec4 color = texture2D(tDiffuse, vUv);
+      
+//       // Calculate screen-space coordinates with pixel ratio adjustment
+//       float scaleFactor = 1.0 / pixelRatio;
+//       vec2 screenPos = gl_FragCoord.xy * scaleFactor;
+      
+//       // Apply consistent pattern size
+//       vec2 patternCoord = mod(screenPos, patternSize) / patternSize;
+//       float threshold = texture2D(ditherPattern, patternCoord).r;
+      
+//       // Calculate luminance
+//       float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+      
+//       // Skip dithering for very dark areas
+//       if (luminance < 0.01) {
+//           gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
+//           return;
+//       }
+      
+//       // Apply dithering to each color channel separately
+//       float r = step(threshold, color.r);
+//       float g = step(threshold, color.g);
+//       float b = step(threshold, color.b);
+      
+//       // Mix between full color and dithered color
+//       vec3 ditheredColor = mix(
+//           color.rgb,
+//           vec3(r, g, b),
+//           ditherStrength
+//       );
+      
+//       gl_FragColor = vec4(ditheredColor, color.a);
+//   }
+// `,
+//     };
+  
+//     this.ditherPass = new ShaderPass(ditherShader);
+//     this.composer.addPass(this.ditherPass);
+//   }
+
+// Replace your setupPostProcessing method with this:
 setupPostProcessing() {
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
   
     const ditherShader = {
-        uniforms: {
-          tDiffuse: { value: null },
-          resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-          ditherPattern: { value: this.createDitherPattern() },
-          patternSize: { value: 8.0 },
-          pixelRatio: { value: window.devicePixelRatio }, // Add this line
-          ditherStrength: { value: 0.9 }
-        },
-        // Rest of shader code
+      uniforms: {
+        tDiffuse: { value: null },
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        pixelRatio: { value: window.devicePixelRatio },
+        matrixSize: { value: 4.0 }, // Can be 2.0, 4.0, or 8.0
+        bias: { value: 0.0 },      // Bias for the threshold
+        ditherStrength: { value: 0.4 }
+      },
       vertexShader: `
         varying vec2 vUv;
         void main() {
@@ -273,49 +345,92 @@ setupPostProcessing() {
         }
       `,
       fragmentShader: `
-  uniform sampler2D tDiffuse;
-  uniform vec2 resolution;
-  uniform sampler2D ditherPattern;
-  uniform float patternSize;
-  uniform float ditherStrength;
-  uniform float pixelRatio; // Use the device's pixel ratio
-  varying vec2 vUv;
-
-  void main() {
-      vec4 color = texture2D(tDiffuse, vUv);
-      
-      // Calculate screen-space coordinates with pixel ratio adjustment
-      float scaleFactor = 1.0 / pixelRatio;
-      vec2 screenPos = gl_FragCoord.xy * scaleFactor;
-      
-      // Apply consistent pattern size
-      vec2 patternCoord = mod(screenPos, patternSize) / patternSize;
-      float threshold = texture2D(ditherPattern, patternCoord).r;
-      
-      // Calculate luminance
-      float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-      
-      // Skip dithering for very dark areas
-      if (luminance < 0.01) {
-          gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
-          return;
-      }
-      
-      // Apply dithering to each color channel separately
-      float r = step(threshold, color.r);
-      float g = step(threshold, color.g);
-      float b = step(threshold, color.b);
-      
-      // Mix between full color and dithered color
-      vec3 ditheredColor = mix(
-          color.rgb,
-          vec3(r, g, b),
-          ditherStrength
-      );
-      
-      gl_FragColor = vec4(ditheredColor, color.a);
-  }
-`,
+        precision highp float;
+        uniform sampler2D tDiffuse;
+        uniform vec2 resolution;
+        uniform float pixelRatio;
+        uniform float matrixSize;
+        uniform float bias;
+        uniform float ditherStrength;
+        varying vec2 vUv;
+        
+        // Bayer matrices of different sizes
+        const mat2 bayerMatrix2x2 = mat2(
+          0.0, 2.0,
+          3.0, 1.0
+        ) / 4.0;
+        
+        const mat4 bayerMatrix4x4 = mat4(
+          0.0, 8.0, 2.0, 10.0,
+          12.0, 4.0, 14.0, 6.0,
+          3.0, 11.0, 1.0, 9.0,
+          15.0, 7.0, 13.0, 5.0
+        ) / 16.0;
+        
+        // For 8x8 matrix, we'll use array indexing
+        const float bayerMatrix8x8[64] = float[64](
+          0.0/64.0, 48.0/64.0, 12.0/64.0, 60.0/64.0, 3.0/64.0, 51.0/64.0, 15.0/64.0, 63.0/64.0,
+          32.0/64.0, 16.0/64.0, 44.0/64.0, 28.0/64.0, 35.0/64.0, 19.0/64.0, 47.0/64.0, 31.0/64.0,
+          8.0/64.0, 56.0/64.0, 4.0/64.0, 52.0/64.0, 11.0/64.0, 59.0/64.0, 7.0/64.0, 55.0/64.0,
+          40.0/64.0, 24.0/64.0, 36.0/64.0, 20.0/64.0, 43.0/64.0, 27.0/64.0, 39.0/64.0, 23.0/64.0,
+          2.0/64.0, 50.0/64.0, 14.0/64.0, 62.0/64.0, 1.0/64.0, 49.0/64.0, 13.0/64.0, 61.0/64.0,
+          34.0/64.0, 18.0/64.0, 46.0/64.0, 30.0/64.0, 33.0/64.0, 17.0/64.0, 45.0/64.0, 29.0/64.0,
+          10.0/64.0, 58.0/64.0, 6.0/64.0, 54.0/64.0, 9.0/64.0, 57.0/64.0, 5.0/64.0, 53.0/64.0,
+          42.0/64.0, 26.0/64.0, 38.0/64.0, 22.0/64.0, 41.0/64.0, 25.0/64.0, 37.0/64.0, 21.0/64.0
+        );
+        
+        // Get threshold value from Bayer matrix
+        float getBayerThreshold(vec2 position) {
+          // Scale position by pixelRatio to ensure consistent pattern size
+          vec2 scaledPos = position / pixelRatio;
+          
+          if (matrixSize == 2.0) {
+            int x = int(mod(scaledPos.x, 2.0));
+            int y = int(mod(scaledPos.y, 2.0));
+            return bayerMatrix2x2[y][x];
+          } 
+          else if (matrixSize == 4.0) {
+            int x = int(mod(scaledPos.x, 4.0));
+            int y = int(mod(scaledPos.y, 4.0));
+            return bayerMatrix4x4[y][x];
+          }
+          else { // Default to 8x8
+            int x = int(mod(scaledPos.x, 8.0));
+            int y = int(mod(scaledPos.y, 8.0));
+            return bayerMatrix8x8[y * 8 + x];
+          }
+        }
+        
+        void main() {
+          vec4 color = texture2D(tDiffuse, vUv);
+          
+          // Calculate luminance
+          float luminance = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+          
+          // Skip dithering for very dark areas
+          if (luminance < 0.01) {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, color.a);
+            return;
+          }
+          
+          // Get the threshold from Bayer matrix
+          float threshold = getBayerThreshold(gl_FragCoord.xy) + bias;
+          
+          // Apply dithering to each color channel separately
+          float r = step(threshold, color.r);
+          float g = step(threshold, color.g);
+          float b = step(threshold, color.b);
+          
+          // Mix between full color and dithered color
+          vec3 ditheredColor = mix(
+            color.rgb,
+            vec3(r, g, b),
+            ditherStrength
+          );
+          
+          gl_FragColor = vec4(ditheredColor, color.a);
+        }
+      `
     };
   
     this.ditherPass = new ShaderPass(ditherShader);
@@ -992,6 +1107,7 @@ createDitherPattern() {
   // Update shader uniforms
   
   // Update the shader uniforms
+//   Update the shader uniforms
   if (this.ditherPass) {
     this.ditherPass.uniforms.resolution.value.set(
       window.innerWidth,
@@ -1002,6 +1118,16 @@ createDitherPattern() {
     
     // Update dither scale and pixel ratio
     // this.updateDitherScale();
+  }
+
+
+// Add a method to update dither matrix size on the fly (optional)
+updateDitherSettings(matrixSize = 8, bias = 0, strength = 0.9) {
+    if (this.ditherPass) {
+      this.ditherPass.uniforms.matrixSize.value = matrixSize;
+      this.ditherPass.uniforms.bias.value = bias;
+      this.ditherPass.uniforms.ditherStrength.value = strength;
+    }
   }
   
 
@@ -1199,8 +1325,8 @@ class BillboardText extends THREE.Object3D {
 
 // Add this event listener to also handle devicePixelRatio changes
 // Add this in your setup() method after creating the renderer
-window.addEventListener('resize', () => {
-    // Reset renderer pixel ratio and size
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.onWindowResize();
-  });
+// window.addEventListener('resize', () => {
+//     // Reset renderer pixel ratio and size
+//     this.renderer.setPixelRatio(window.devicePixelRatio);
+//     this.onWindowResize();
+//   });
