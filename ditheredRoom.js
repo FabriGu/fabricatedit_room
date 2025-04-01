@@ -7,8 +7,7 @@ import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { GalleryOverlay } from "./galleryOverlay.js";
 import { EnhancedControls } from "./enhancedControls.js"; // Import the new controls
 
-const vertices = [1, 1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1];
-const indices = [2, 1, 0, 0, 3, 2, 1, 3, 0, 2, 3, 1];
+
 // Mario 64 Star Implementation for Three.js
 function createMarioStar(size = 1, points = 5, innerRadius = 0.4, bulge = 1.55) {
 
@@ -161,6 +160,9 @@ function createMarioStarMaterial(color = 0xFFDF00) {
 
 
 export class DitheredRoom {
+  static TEXT_LAYER = 1;  // Layer 0 is the default layer
+
+
   constructor(containerId) {
     this.container = document.getElementById(containerId);
     this.viewpoints = new Map();
@@ -174,9 +176,11 @@ export class DitheredRoom {
     // this.setupOverlay();
 
     this.setupInteractionSystem();
+    
   }
 
   setup() {
+    
     // Previous setup code remains the same...
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x111111);
@@ -1264,6 +1268,7 @@ class BillboardText extends THREE.Object3D {
 
     // Create sprite with proper scaling
     this.sprite = new THREE.Sprite(material);
+    // this.sprite.layers.set(DitheredRoom.TEXT_LAYER);  
     // Maintain aspect ratio while fitting within maxWidth
     const aspectRatio = canvas.width / canvas.height;
     this.sprite.scale.set(finalScale, finalScale / aspectRatio, 1);

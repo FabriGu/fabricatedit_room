@@ -54,13 +54,13 @@ export class WorkCard {
 
     // make title text
     const title = document.createElement("div");
-    title.className = "title fontQuaternary";
+    title.className = "text-container-title fontSecondary";
     title.textContent = this.data.title;
     title.style.display = "none";
 
     // add text to pop up infornt of the img/video
     const text = document.createElement("div");
-    text.className = "text fontQuinary";
+    text.className = "text-container-subtitle fontTertiary";
     // text.textContent = this.data.title;
     text.textContent = this.data.description;
     // make content initially hidden
@@ -360,12 +360,12 @@ export class WorkCard {
     textContainer.className = "text-container";
 
     const title = document.createElement("div");
-    title.className = "title fontQuaternary";
+    title.className = "text-container-title fontSecondary";
     title.textContent = this.data.title;
     title.style.display = "none";
 
     const text = document.createElement("div");
-    text.className = "text fontQuinary";
+    text.className = "text-container-subtitle fontTertiary";
     text.textContent = this.data.description;
     text.style.display = "none";
 
@@ -631,7 +631,7 @@ export class WorkLoader {
       title.innerHTML = "Work";
 
       // title.classList.add("fontSecondary");
-      title.className = "title fontQuaternary";
+      title.className = "title fontPrimary";
       console.log(title);
       // console.log('Creating title');
       // append as first item in the container
@@ -647,7 +647,7 @@ export class WorkLoader {
     } else if (this.containerType == "music") {
       const title = document.createElement("h3");
       title.innerHTML = "Music I Like";
-      title.className = "title fontQuaternary";
+      title.className = "title fontPrimary";
       this.container.parentElement.insertBefore(
         title,
         this.container.parentElement.firstChild
@@ -657,7 +657,7 @@ export class WorkLoader {
     } else if (this.containerType == "fasho") {
       const title = document.createElement("h3");
       title.innerHTML = "Fashion";
-      title.className = "title fontQuaternary";
+      title.className = "title fontPrimary";
       this.container.parentElement.insertBefore(
         title,
         this.container.parentElement.firstChild
