@@ -96,6 +96,7 @@ function createMarioStar(size = 1, points = 5, innerRadius = 0.4, bulge = 1.55) 
     // Compute normals
     geometry.computeVertexNormals();
     geometry.rotateZ(THREE.MathUtils.degToRad(360/10));
+    geometry.rotateX(THREE.MathUtils.degToRad(90))
     // geometry.rotateY()
     
     return geometry;
@@ -842,9 +843,9 @@ createDitherPattern() {
     const geometries = {
       default: new THREE.BoxGeometry(0.3, 0.3, 0.3),
       viewpoint: new THREE.SphereGeometry(0.2, 32, 32), // Increased segments for smoother glow
-
+      info: new THREE.SphereGeometry(0.3,0.3,0.4)
     //   info: new THREE.ConeGeometry(0.2, 0.35, 32),
-         info: createMarioStar(0.3, 5, 0.5, 0.3)
+        //  info: createMarioStar(0.3, 5, 0.5, 0.3)
         //  info: createSmoothMarioStar(0.3,5,0.4,0.5)
       //  info : new THREE.PolyhedronGeometry(vertices, indices, 20)
       // info: new THREE.Tetrahedron(0.2,0.2,32)
@@ -878,7 +879,14 @@ createDitherPattern() {
     // this.scene.add(pointLight);
     
     // Create a bigger, transparent sphere for the glow effect
-    const glowGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+    let glowGeometry= null;
+    if (type == "viewpoint") {
+      glowGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+    } else if (type == "info") {
+      glowGeometry = createMarioStar(0.3, 5, 0.5, 0.3);
+
+    }
+    
     const glowMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
