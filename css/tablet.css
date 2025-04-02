@@ -158,10 +158,6 @@
   canvas {
     display: block;
   }
-
-  p {
-    margin: 0 !important;
-  }
   
   /* ----------------------------------------------------------------------- P5 */
   #p5-container {
@@ -324,24 +320,19 @@
       justify-content: center;
       align-items: center;
       /* width: 30%; */
-      margin-bottom: 1vh;
-      
   }
 
   #email {
     color:#fff !important;
     text-align: center;
     margin-bottom: 2px;
-
   }
   
   #socials a {
     
-      margin:2px !important;
+      margin:5px !important;
       /* width: 50%; */
       height: auto;
-      width: 35px;
-      height: 35px;
   }
   /* ------------------------------------------------------------INFO POPUP */
   #infoPopup {
@@ -543,8 +534,8 @@
   /* padding: 1rem; */
   /* padding-bottom: 1rem; */
   padding: 1vh;
-  padding-left: 3vw;
-  padding-right: 3vw;
+  padding-left: 2rem;
+  padding-right: 2rem;
   
   width: 100%;
   text-align: center;
@@ -563,7 +554,7 @@
   font-size: 3.056vw;
   line-height: 1;
   /* text-align: center; */
-  /* margin-bottom: 1rem; */
+  margin-bottom: 1rem;
   text-align: justify;
   text-justify: distribute; /* Some browsers improve spacing with this */
 }
