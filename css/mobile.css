@@ -330,8 +330,9 @@
 
   #email {
     color:#fff !important;
-    text-align: center;
+    text-align: center !important;
     margin-bottom: 2px;
+    
 
   }
   

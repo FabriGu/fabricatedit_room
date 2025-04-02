@@ -333,6 +333,8 @@
       margin:5px !important;
       /* width: 50%; */
       height: auto;
+      width: 70px;
+      height: 70px;
   }
   /* ------------------------------------------------------------INFO POPUP */
   #infoPopup {

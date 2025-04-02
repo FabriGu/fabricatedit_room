@@ -215,7 +215,7 @@
     /* width: 80%; */
   
     text-align: justify;
-    border-radius: 4px;
+    
     
   }
   
@@ -229,7 +229,7 @@
     justify-content: center;
     /* width: 100%; */
 
-    
+    border-radius: 4px;
   
   }
   
@@ -297,6 +297,7 @@
     /* width: 100%; */
     padding: 1vw !important;
     
+    border-radius: 4px !important;
     
   }
   
@@ -322,6 +323,7 @@
 
   #email {
     color:#fff !important;
+    margin: 0;
   }
   
   #socials a {
@@ -329,6 +331,8 @@
       margin:5px !important;
       /* width: 50%; */
       height: auto;
+      width: 100px;
+      height: 100px;
   }
   /* ------------------------------------------------------------INFO POPUP */
   #infoPopup {
@@ -530,8 +534,8 @@
   /* padding: 1rem; */
   /* padding-bottom: 1rem; */
   padding: 1vh;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 4rem;
+  padding-right: 4rem;
   
   width: 100%;
   text-align: center;
